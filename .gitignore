@@ -135,3 +135,4 @@ docs/build/
 docs/source/_static/report.html
 
 .csvforwkt/
+tests/iau.wkt

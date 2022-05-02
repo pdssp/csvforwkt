@@ -89,7 +89,7 @@ lint:  ## Lint and static-check
 	mypy csvforwkt
 
 tests:  ## Run tests
-	pytest -ra
+	unzip tests/iau.zip -d tests/ && pytest -ra
 
 tox:
 	tox -e py38

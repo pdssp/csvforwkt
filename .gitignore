@@ -133,3 +133,5 @@ csvforwkt-env/
 docs/build/
 
 docs/source/_static/report.html
+
+.csvforwkt/

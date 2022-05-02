@@ -1,4 +1,14 @@
-### Remove custom config file (HEAD -> main)
+### Update Readme (HEAD -> main)
+>Tue, 3 May 2022 00:55:32 +0200
+
+>Author: Jean-Christophe Malapert (jean-christophe.malapert@cnes.fr)
+
+>Commiter: Jean-Christophe Malapert (jean-christophe.malapert@cnes.fr)
+
+
+
+
+### Remove custom config file (origin/main)
 >Tue, 3 May 2022 00:49:27 +0200
 
 >Author: Jean-Christophe Malapert (jean-christophe.malapert@cnes.fr)
@@ -8,7 +18,7 @@
 
 
 
-### Add custom config in .gitignore (origin/main)
+### Add custom config in .gitignore
 >Tue, 3 May 2022 00:46:27 +0200
 
 >Author: Jean-Christophe Malapert (jean-christophe.malapert@cnes.fr)

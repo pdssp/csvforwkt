@@ -16,7 +16,9 @@ csvForWKT
 .. image https://img.shields.io/github/forks/pole-surfaces-planetaires/csvforwkt?style=social
 
 
-csvForWKT is a python script that creates a WKT-crs for some bodies from the solar system. The content that is filled in the WKT-crs comes from the report of IAU Working Group on Cartographic.
+csvForWKT is a python script that creates a WKT-crs for solar system bodies.
+The physical content of the WKT-crs comes from the IAU Working Group on
+Cartographic Coordinates and Rotational Elements report.
 
 
 Stable release
@@ -88,10 +90,12 @@ To get more information about the preconfigured tasks:
 Usage
 -----
 
-To use csvForWKT in a project::
+To use csvForWKT:
 
-    import csvforwkt
+    .. code-block:: console
 
+        $ make
+        $ csvforwkt --iau_report data/naifcodes_radii_m_wAsteroids_IAU2015.csv --iau_version 2015 --iau_doi doi://10.1007/s10569-017-9805-5
 
 
 Run tests

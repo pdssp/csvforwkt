@@ -11,7 +11,6 @@ Welcome to csvForWKT's documentation!
    introduction
    purpose
    getting_starting
-   reference_manual
 
 ================
 Analytical Index

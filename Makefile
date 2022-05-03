@@ -100,6 +100,7 @@ doc:
 	pytest -ra --html=docs/source/_static/report.html
 	make coverage
 	coverage html -d docs/source/_static/coverage
+	make projections -C docs
 	make html -C docs
 
 doc-pdf:

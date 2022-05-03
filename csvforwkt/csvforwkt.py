@@ -317,6 +317,15 @@ class CsvforwktLib:
     def _process_body_crs(self, body: pd.DataFrame) -> Dict[int, ICrs]:
         """Process bodies to avoid duplicate desriptions
 
+        The Rules are the following to avoid duplication:
+        * For each shape, we approximate the shape as a sphere and we create
+          a planetocentric (or planetographic) reference frame with east direction.
+        * if the shape is a sphere => planetocentric based on an ellipsoid is
+          not needed  else planetocentric description is created
+        * if the shape is a sphere and (retrograde movement or historical) =>
+          planetographic is not needed because the planetographic = planetocentric
+          else plantetographic description is created
+
         Args:
             body (pd.DataFrame): bodies
 
@@ -372,9 +381,9 @@ class CsvforwktLib:
 
         crs: Dict[int, ICrs] = self._process_body_crs(biaxial)
         crs.update(self._process_body_crs(triaxial))
-        logger.info("\tprocess WKT for biaxial ... OK")
+        logger.info("\tprocess WKT for biaxial bodies ... OK")
         crs.update(self._process_body_projection_crs(crs))
-        logger.info("\tprocess WKT for triaxial ... OK")
+        logger.info("\tprocess WKT for triaxial bodies ... OK")
 
         return collections.OrderedDict(sorted(crs.items()))
 
@@ -391,6 +400,6 @@ class CsvforwktLib:
                 file.write(wkt.wkt())
                 file.write("\n\n")
         logger.info(
-            f"\tSave the WKT in {os.path.join(self.directory, 'iau.wkt')} ... OK"
+            f"\tSave the WKTs in {os.path.join(self.directory, 'iau.wkt')} ... OK"
         )
         logger.info("Finished.")

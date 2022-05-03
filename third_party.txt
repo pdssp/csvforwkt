@@ -62,6 +62,7 @@ pip-licenses
  six                            1.16.0     MIT License
  snowballstemmer                2.2.0      BSD License
  sphinx-bootstrap-theme         0.8.0      MIT License
+ sphinx-exec-directive          0.6        MIT License
  sphinx-rtd-theme               1.0.0      MIT License
  sphinxcontrib-applehelp        1.0.2      BSD License
  sphinxcontrib-devhelp          1.0.2      BSD License

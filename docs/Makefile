@@ -12,7 +12,12 @@ BUILDDIR      = build
 help:
 	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
-.PHONY: help Makefile
+# Build list of projections
+projections:
+	@$(info Generating 'list_projections.rst'...) $(0)
+	@python $(SOURCEDIR)/genproj.py "SI"> $(SOURCEDIR)/list_projections.rst
+
+.PHONY: help Makefile projections
 
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).

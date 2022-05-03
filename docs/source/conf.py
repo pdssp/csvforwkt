@@ -57,6 +57,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
     "sphinxcontrib.plantuml",
+    "sphinx_exec_directive",
 ]
 
 # Add any paths that contain templates here, relative to this directory.

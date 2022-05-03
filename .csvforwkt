@@ -1,0 +1,2 @@
+python3 -m venv csvforwkt-env && export PYTHONPATH=. && export PATH=/home/malapert/Dev/csvforwkt/csvforwkt-env/bin:/home/malapert/.deta/bin:/usr/lib/jvm/java-8-openjdk-amd64/bin:/home/malapert/.deta/bin:/usr/lib/jvm/java-8-openjdk-amd64/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/lib/jvm/java-8-openjdk-amd64/bin:/usr/lib/jvm/java-8-openjdk-amd64/bin
+source "/home/malapert/Dev/csvforwkt/csvforwkt-env/bin/activate"

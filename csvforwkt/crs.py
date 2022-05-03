@@ -1,6 +1,46 @@
 # -*- coding: utf-8 -*-
-"""This module is responsible to create the Coordinate Reference System of
-a body."""
+"""One body can be defined by one of the two following shapes:
+    * a biaxial body
+    * a triaxial body
+
+
+At each shape, we can define three reference frames :
+    * spherical frame where a sphere is defined for interoperability purpose
+    * planetocentric frame
+    * planetographic frame
+
+For a spherical shape, the planetocentric latitude and the planetographic
+latitude are identical. So a planetographic latitude is used.
+
+Planetographic longitude is usually defined such that the sub-observer
+longitude increases with time as seen by a distant, fixed observer
+
+Positive logitudes in one direction are defined with the following rule
+
+.. uml::
+    :caption: Positive longitude rules
+
+    start
+
+    if (historical reason or IAU_code >= 9000?) then (yes)
+    :East;
+    stop
+    else (no )
+    if (ocentric frame ?) then (yes)
+        :East;
+        stop
+    else (no)
+        if (rotation == "Direct" ?) then (yes)
+            :West;
+            stop
+        else (no)
+            :East;
+            stop
+        endif
+    endif
+    endif
+
+"""
 from abc import ABCMeta
 from abc import abstractmethod
 from abc import abstractproperty
@@ -85,60 +125,7 @@ class ReferenceBodyCrs(Enum):
 
 @ICrs.register
 class BodyCrs(ICrs):
-    """The description of the body Coordinate Reference System.
-
-    One body can be defined by one of the two following shape:
-    * a biaxial body
-    * a triaxial body
-
-    #.. image:: body.png
-    #    :width: 200px
-
-    For each shape, a :
-    * spherical frame with a sphere is defined for interoperability purpose
-    * planetoocentric frame
-    * planetographic frame
-
-    #.. image:: planetocentric.png
-    #    :width: 200px
-
-
-    #.. image:: planetographic.png
-    #    :width: 200px
-
-
-    For a spherical shape, the planetocentric latitude and the planetographic
-    latitude are identical. So a planetographic latitude is used.
-
-    Planetographic longitude is usually defined such that the sub-observer
-    longitude increases with time as seen by a distant, fixed observer
-
-    The longitude is positively according to this decision tree:
-
-    .. uml::
-
-        start
-
-        if (historical reason or IAU_code >= 9000?) then (yes)
-        :East;
-        stop
-        else (no )
-        if (ocentric frame ?) then (yes)
-            :East;
-            stop
-        else (no)
-            if (rotation == "Direct" ?) then (yes)
-                :West;
-                stop
-            else (no)
-                :East;
-                stop
-            endif
-        endif
-        endif
-
-
-    """
+    """The description of the body Coordinate Reference System."""
 
     TEMPLATE_OGRAPHIC = """GEOGCRS["$name ($version) / Ographic",
 \t$datum,

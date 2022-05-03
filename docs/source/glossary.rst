@@ -7,3 +7,15 @@ Terms, definitions and abbreviated terms
 
     SUM
         Software User Manual
+
+    CRS
+        Coordinate Reference System
+
+    IAU
+        International Astronomical Union
+
+    WKT
+        Well-Known-Text
+
+    CSV
+        Comma Separated Values

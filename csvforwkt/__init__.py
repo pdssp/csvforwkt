@@ -18,10 +18,55 @@
 # along with csvForWKT.  If not, see <https://www.gnu.org/licenses/>.
 """csvForWKT is a python script that creates a WKT-crs for solar system bodies.
 The physical content of the WKT-crs comes from the IAU Working Group on
-Cartographic Coordinates and Rotational Elements report."""
+Cartographic Coordinates and Rotational Elements report.
+
+The workflow to generate the WKTs is described as follows:
+
+.. uml::
+
+    start
+
+    :Skip records from IAU report;
+    :Split bodies;
+    if (biaxial?) then (yes)
+        :Compute planetocentric description for sphere using median radius\n for Interoperability case;
+        :Add this CRS in the list;
+        if (is a body a Sphere?) then (yes)
+        else (no)
+            :compute CRS planetocentric description with ellipsoid shape;
+            :Add this CRS in the list;
+        endif
+        if (is a body a Sphere and (historical reason or retrograde movement) ?) then (yes)
+        else (no)
+            :Compute CRS planetographic;
+            :Add this CRS in the list;
+        endif
+    else (no)
+        :Create planetocentric description for sphere using median radius\n for Interoperability case;
+        :Add this CRS in the list;
+        if (is a body a Sphere?) then (yes)
+        else (no)
+            :compute CRS planetocentric description with ellipsoid shape;
+            :Add this CRS in the list;
+        endif
+        if (is a body a Sphere and (historical reason or retrograde movement) ?) then (yes)
+        else (no)
+            :Compute CRS planetographic;
+            :Add this CRS in the list;
+        endif
+    endif
+    :merge CRS;
+    :Compute projected CRS;
+
+    stop
+"""
 import logging.config
 import os
+from logging import debug
+from logging import getLogger
 from logging import NullHandler
+from logging import setLogRecordFactory
+from logging import warning
 
 from ._version import __author__
 from ._version import __author_email__
@@ -35,7 +80,7 @@ from ._version import __version__
 from .custom_logging import LogRecord
 from .custom_logging import UtilsLogs
 
-logging.getLogger(__name__).addHandler(NullHandler())
+getLogger(__name__).addHandler(NullHandler())
 
 UtilsLogs.add_logging_level("TRACE", 15)
 try:
@@ -44,7 +89,7 @@ try:
         os.path.join(PATH_TO_CONF, "logging.conf"),
         disable_existing_loggers=False,
     )
-    logging.debug(f"file {os.path.join(PATH_TO_CONF, 'logging.conf')} loaded")
+    debug(f"file {os.path.join(PATH_TO_CONF, 'logging.conf')} loaded")
 except Exception as exception:  # pylint: disable=broad-except
-    logging.warning(f"cannot load logging.conf : {exception}")
-logging.setLogRecordFactory(LogRecord)  # pylint: disable=no-member
+    warning(f"cannot load logging.conf : {exception}")
+setLogRecordFactory(LogRecord)  # pylint: disable=no-member

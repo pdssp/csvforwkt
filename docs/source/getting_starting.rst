@@ -9,7 +9,9 @@ Make sure that Python 3.8 (or later) is available, and install the latest versio
 
 .. code-block:: shell
 
-    pip install git+https://github.com/pole-surfaces-planetaires/csvforwkt.git@latest
+    $ pip install git+https://github.com/pole-surfaces-planetaires/csvforwkt.git@latest
+    $ cd csv2forwkt
+    $ make
 
 
 Running the software

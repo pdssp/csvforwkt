@@ -35,6 +35,8 @@ class IBody(metaclass=ABCMeta):
             and callable(subclass.wkt)
             and hasattr(subclass, "name")
             and callable(subclass.name)
+            and hasattr(subclass, "shape")
+            and callable(subclass.shape)
             and hasattr(subclass, "warning")
             and callable(subclass.warning)
             or NotImplemented
@@ -49,6 +51,18 @@ class IBody(metaclass=ABCMeta):
 
         Returns:
             str: the name of the shape
+        """
+        raise NotImplementedError("Not implemented")
+
+    @abstractproperty  # pylint: disable=bad-option-value,deprecated-decorator
+    def shape(self) -> ReferenceShape:
+        """Returns the name of the shape.
+
+        Raises:
+            NotImplementedError: Not implemented
+
+        Returns:
+            ReferenceShape: the name of the shape
         """
         raise NotImplementedError("Not implemented")
 
@@ -143,8 +157,8 @@ class IBody(metaclass=ABCMeta):
 class Ellipsoid(IBody):
     """An Ellipoid shape."""
 
-    TEMPLATE = """ELLIPSOID["$ellipsoide_name ($version)",$radius,$inverse_flat,
-\t\t\tLENGTHUNIT["metre", 1, ID["EPSG", 9001]]]"""
+    TEMPLATE = """ELLIPSOID["$ellipsoide_name ($version)", $radius, $inverse_flat,
+\t\tLENGTHUNIT["metre", 1, ID["EPSG", 9001]]]"""
 
     def __init__(self, name: str, radius: float, inverse_flat: float):
         """Create an ellipsoid shape.
@@ -185,6 +199,15 @@ class Ellipsoid(IBody):
         :type: float
         """
         return self.__inverse_flat
+
+    @property
+    def shape(self) -> ReferenceShape:
+        """The shape.
+
+        :getter: Returns the shape
+        :type: ReferenceShape
+        """
+        return ReferenceShape.ELLIPSE
 
     @property
     def warning(self) -> Optional[str]:
@@ -230,8 +253,8 @@ class Ellipsoid(IBody):
 class Sphere(IBody):
     """A sphere shape."""
 
-    TEMPLATE = """ELLIPSOID["$ellipsoide_name ($version) - Sphere",$radius,0,
-\t\t\tLENGTHUNIT["metre", 1, ID["EPSG", 9001]]]"""
+    TEMPLATE = """ELLIPSOID["$ellipsoide_name ($version) - Sphere", $radius, 0,
+\t\tLENGTHUNIT["metre", 1, ID["EPSG", 9001]]]"""
 
     def __init__(self, name: str, radius: float):
         """Create a sphere desctription
@@ -261,6 +284,15 @@ class Sphere(IBody):
         :type: float
         """
         return self.__radius
+
+    @property
+    def shape(self) -> ReferenceShape:
+        """The shape.
+
+        :getter: Returns the shape
+        :type: ReferenceShape
+        """
+        return ReferenceShape.SPHERE
 
     @property
     def warning(self) -> Optional[str]:
@@ -305,8 +337,8 @@ class Sphere(IBody):
 class Triaxial(IBody):
     """A triaxial shape."""
 
-    TEMPLATE = """TRIAXIAL["ellipsoide_name ($version)",$semi_major,$semi_median,$semi_minor,
-\t\t\tLENGTHUNIT["metre", 1, ID["EPSG", 9001]]]"""
+    TEMPLATE = """TRIAXIAL["ellipsoide_name ($version)", $semi_major, $semi_median, $semi_minor,
+\t\tLENGTHUNIT["metre", 1, ID["EPSG", 9001]]]"""
 
     def __init__(
         self,
@@ -364,6 +396,15 @@ class Triaxial(IBody):
         :type: float
         """
         return self.__semi_median
+
+    @property
+    def shape(self) -> ReferenceShape:
+        """The shape.
+
+        :getter: Returns the shape
+        :type: ReferenceShape
+        """
+        return ReferenceShape.TRIAXIAL
 
     @property
     def warning(self) -> Optional[str]:

@@ -5,7 +5,7 @@
 
 
 At each shape, we can define three reference frames :
-    * spherical frame where a sphere is defined for interoperability purpose
+    * planetocentric frame with a sphere for interoperability purpose
     * planetocentric frame
     * planetographic frame
 
@@ -41,6 +41,7 @@ Positive logitudes in one direction are defined with the following rule
     endif
 
 """
+# pylint: disable=too-many-lines
 from abc import ABCMeta
 from abc import abstractmethod
 from abc import abstractproperty
@@ -53,8 +54,12 @@ from typing import List
 from typing import Tuple
 
 import numpy as np  # pylint: disable=import-error
+import pandas as pd  # pylint: disable=import-error
 
 from .body import IAU_REPORT
+from .body import IBody
+from .body import ReferenceShape
+from .datum import Anchor
 from .datum import Datum
 
 
@@ -68,6 +73,8 @@ class ICrs(metaclass=ABCMeta):
             and callable(subclass.iau_code)
             and hasattr(subclass, "wkt")
             and callable(subclass.wkt)
+            and hasattr(subclass, "datum")
+            and callable(subclass.datum)
             or NotImplemented
         )
 
@@ -77,6 +84,15 @@ class ICrs(metaclass=ABCMeta):
 
         :getter: Returns the IAU code
         :type: int
+        """
+        raise NotImplementedError("Not implemented")
+
+    @abstractproperty  # pylint: disable=no-self-use,bad-option-value,deprecated-decorator
+    def datum(self) -> Datum:
+        """Datum.
+
+        :getter: Returns the datum
+        :type: Datum
         """
         raise NotImplementedError("Not implemented")
 
@@ -90,14 +106,21 @@ class ICrs(metaclass=ABCMeta):
         raise NotImplementedError("Not implemented")
 
 
-class ReferenceBodyCrs(Enum):
-    """Reference body for CRS."""
+class CrsType(Enum):
+    """Type of CRS."""
 
-    SPHERE_OCENTRIC = ("Sphere", "Ocentric", 0)
-    ELLIPSE_OGRAPHIC = ("Ellipse", "Ographic", 1)
-    ELLIPSE_OCENTRIC = ("Ellipse", "Ocentric", 2)
-    TRIAXIAL_OGRAPHIC = ("Triaxial", "Ographic", 3)
-    TRIAXIAL_OCENTRIC = ("Triaxial", "Ocentric", 4)
+    OCENTRIC = "Ocentric"
+    OGRAPHIC = "Ographic"
+
+
+class BodyCrsCode(Enum):
+    """Code related to the shape and the coordinate reference system."""
+
+    SPHERE_OCENTRIC = ("Sphere", CrsType.OCENTRIC.value, 0)
+    ELLIPSE_OGRAPHIC = ("Ellipse", CrsType.OGRAPHIC.value, 1)
+    ELLIPSE_OCENTRIC = ("Ellipse", CrsType.OCENTRIC.value, 2)
+    TRIAXIAL_OGRAPHIC = ("Triaxial", CrsType.OGRAPHIC.value, 3)
+    TRIAXIAL_OCENTRIC = ("Triaxial", CrsType.OCENTRIC.value, 4)
 
     def __init__(self, shape: str, reference: str, code: int):
         """Creates the enum
@@ -128,47 +151,43 @@ class BodyCrs(ICrs):
     """The description of the body Coordinate Reference System."""
 
     TEMPLATE_OGRAPHIC = """GEOGCRS["$name ($version) / Ographic",
-\t$datum,
+    $datum,
 \tCS[ellipsoidal, 2],
 \t    AXIS["geodetic latitude (Lat)", north,
 \t        ORDER[1],
-\t        ANGLEUNIT["degree",0.0174532925199433]],
+\t        ANGLEUNIT["degree", 0.0174532925199433]],
 \t    AXIS["geodetic longitude (Lon)", $direction,
 \t        ORDER[2],
-\t        ANGLEUNIT["degree",0.0174532925199433]],
+\t        ANGLEUNIT["degree", 0.0174532925199433]],
 \tID["IAU", $number, $version],
 \tREMARK["$remark"]]"""
 
     TEMPLATE_OCENTRIC = """GEODCRS["$name ($version) / Ocentric",
-\t$datum,
+    $datum,
 \tCS[spherical, 2],
 \t    AXIS["planetocentric latitude (U)", north,
 \t        ORDER[1],
-\t        ANGLEUNIT["degree",0.0174532925199433]],
+\t        ANGLEUNIT["degree", 0.0174532925199433]],
 \t    AXIS["planetocentric longitude (V)", east,
 \t        ORDER[2],
-\t        ANGLEUNIT["degree",0.0174532925199433]],
+\t        ANGLEUNIT["degree", 0.0174532925199433]],
 \tID["IAU", $number, $version],
 \tREMARK["$remark"]]"""
 
     TEMPLATE_SPHERE = """GEOGCRS["$name ($version) - Sphere / Ocentric",
-\t$datum,
+    $datum,
 \tCS[ellipsoidal, 2],
 \t    AXIS["geodetic latitude (Lat)", north,
 \t        ORDER[1],
-\t        ANGLEUNIT["degree",0.0174532925199433]],
+\t        ANGLEUNIT["degree", 0.0174532925199433]],
 \t    AXIS["geodetic longitude (Lon)", east,
 \t        ORDER[2],
-\t        ANGLEUNIT["degree",0.0174532925199433]],
+\t        ANGLEUNIT["degree", 0.0174532925199433]],
 \tID["IAU", $number, $version],
 \tREMARK["$remark"]]"""
 
     def __init__(
-        self,
-        datum: Datum,
-        number_body: int,
-        direction: str,
-        reference_body: ReferenceBodyCrs,
+        self, datum: Datum, number_body: int, direction: str, crs_type: CrsType
     ):
         """Create a Coordinate Reference System for a celestial body
 
@@ -176,55 +195,70 @@ class BodyCrs(ICrs):
             datum (Datum): datum of the body
             number_body (int): IAU code
             direction (str): rotation sens of the body
-            reference_body (ReferenceBodyCrs): type of body
+            crs_type (CrsType): type of CRS
         """
-        template, number = self._get_template_and_number(
-            reference_body, number_body
+        self.__datum: Datum = datum
+        self.__crs_type: CrsType = crs_type
+        self.__direction: str = self._create_direction(
+            datum.name, direction, crs_type, number_body
         )
         self.__name: str = datum.name
-        self.__datum: Datum = datum
+
+        template, number = self._get_template_and_number(number_body)
         self.__number: int = number
-        self.__direction: str = self._create_direction(
-            datum.name, direction, reference_body, number_body
-        )
-        self.__reference_body: ReferenceBodyCrs = reference_body
         self.__template: str = template
 
     def _get_template_and_number(  # pylint: disable=no-self-use
-        self, reference_body: ReferenceBodyCrs, naif_code: int
+        self, naif_code: int
     ) -> Tuple[str, int]:
         """Returns the template and the number
 
         Args:
-            reference_body (ReferenceBodyCrs): type of shape
             naif_code (int): naif code
 
         Raises:
-            ValueError: "Unsupported type of shape
+            ValueError: "Unknown shape or CRS
 
         Returns:
             Tuple[str, int]: template and number
         """
         template: str
         number: int
-        if reference_body == ReferenceBodyCrs.SPHERE_OCENTRIC:
-            template = BodyCrs.TEMPLATE_SPHERE
-            number = ReferenceBodyCrs.SPHERE_OCENTRIC.get_code(naif_code)
-        elif reference_body == ReferenceBodyCrs.ELLIPSE_OGRAPHIC:
+
+        if self.crs_type == CrsType.OCENTRIC:
+            if self.datum.body.shape == ReferenceShape.SPHERE:
+                template = BodyCrs.TEMPLATE_SPHERE
+                number = BodyCrsCode.SPHERE_OCENTRIC.get_code(naif_code)
+            elif self.datum.body.shape == ReferenceShape.ELLIPSE:
+                template = BodyCrs.TEMPLATE_OCENTRIC
+                number = BodyCrsCode.ELLIPSE_OCENTRIC.get_code(naif_code)
+            elif self.datum.body.shape == ReferenceShape.TRIAXIAL:
+                template = BodyCrs.TEMPLATE_OCENTRIC
+                number = BodyCrsCode.TRIAXIAL_OCENTRIC.get_code(naif_code)
+            else:
+                raise ValueError(
+                    f"Unknown shape : {self.datum.body.shape} for {self.crs_type}"
+                )
+        elif self.crs_type == CrsType.OGRAPHIC:
             template = BodyCrs.TEMPLATE_OGRAPHIC
-            number = ReferenceBodyCrs.ELLIPSE_OGRAPHIC.get_code(naif_code)
-        elif reference_body == ReferenceBodyCrs.ELLIPSE_OCENTRIC:
-            template = BodyCrs.TEMPLATE_OCENTRIC
-            number = ReferenceBodyCrs.ELLIPSE_OCENTRIC.get_code(naif_code)
+            if self.datum.body.shape == ReferenceShape.ELLIPSE:
+                number = BodyCrsCode.ELLIPSE_OGRAPHIC.get_code(naif_code)
+            elif self.datum.body.shape == ReferenceShape.TRIAXIAL:
+                number = BodyCrsCode.TRIAXIAL_OGRAPHIC.get_code(naif_code)
+            else:
+                raise ValueError(
+                    f"Unknown shape : {self.datum.body.shape} for {self.crs_type}"
+                )
         else:
-            raise ValueError(f"Unsupported type of shape: {reference_body}")
+            raise ValueError(f"Unknown CRS : {self.crs_type}")
+
         return template, number
 
     def _create_direction(
         self,
         name: str,
         rotation: str,
-        reference_body: ReferenceBodyCrs,
+        crs_type: CrsType,
         number_body: int,
     ):  # pylint: disable=no-self-use
         """Returns the direction sens according to the rotation.
@@ -232,7 +266,7 @@ class BodyCrs(ICrs):
         Args:
             name (str): body name
             rotation (str): rotation of the body
-            reference_body (ReferenceBodyCrs): Type of shape
+            crs_type (CrsType): Type of CRS
             number_body (int): IAU code of the body
 
 
@@ -245,12 +279,8 @@ class BodyCrs(ICrs):
         if number_body >= 90000 or name.upper() in ["SUN", "EARTH", "MOON"]:
             direction = "east"
 
-        # always to eas in ocentric
-        elif reference_body in (
-            ReferenceBodyCrs.SPHERE_OCENTRIC,
-            ReferenceBodyCrs.ELLIPSE_OCENTRIC,
-            ReferenceBodyCrs.TRIAXIAL_OCENTRIC,
-        ):
+        # always to east in ocentric
+        elif crs_type == CrsType.OCENTRIC:
             direction = "east"
 
         # when Direct => West
@@ -276,13 +306,13 @@ class BodyCrs(ICrs):
         return result
 
     @property
-    def reference_body(self) -> ReferenceBodyCrs:
-        """Returns the type of shape.
+    def crs_type(self) -> CrsType:
+        """Returns the type of CRS.
 
         Returns:
-            ReferenceBodyCrs: Type of shape
+            CrsType: Type of CRS
         """
-        return self.__reference_body
+        return self.__crs_type
 
     @property
     def name(self) -> str:
@@ -303,15 +333,6 @@ class BodyCrs(ICrs):
         return self.__datum
 
     @property
-    def number(self) -> int:
-        """Returns the IAU code of the body.
-
-        Returns:
-            int: the IAU code of the body
-        """
-        return self.__number
-
-    @property
     def direction(self) -> str:
         """Returns the direction where the longitude is counted positively.
 
@@ -327,7 +348,7 @@ class BodyCrs(ICrs):
         Returns:
             str: the IAU code
         """
-        return self.number
+        return self.__number
 
     def wkt(self) -> str:
         """Returns the WKT of the celestial body.
@@ -340,23 +361,175 @@ class BodyCrs(ICrs):
             name=self.name,
             version=IAU_REPORT.VERSION,
             datum=self.datum.wkt(),
-            number=self.number,
+            number=self.iau_code,
             direction=self.direction,
             remark=self._create_remark(),
         )
         return datum
 
 
+class Planetocentric:
+    """Computes the planetocentric coordinate reference system."""
+
+    def __init__(self, row: pd.Series, ref_shape: ReferenceShape):
+        """Creates a description of a planetocentric Coordinate Reference
+        System.
+
+        Args:
+            row (pd.Series): description of the current body
+            ref_shape(ReferenceShape) : Reference of the shape
+
+        Returns:
+            ICrs: Coordinate Reference System description
+        """
+        self.__row: pd.dataframe = row
+        self.__ref_shape: ReferenceShape = ref_shape
+        self.__crs: BodyCrs = self._crs()
+
+    @property
+    def row(self) -> pd.DataFrame:
+        """Description of the current body.
+
+        Returns:
+            str: Description of the current body
+        """
+        return self.__row
+
+    @property
+    def ref_shape(self) -> ReferenceShape:
+        """Shape related to this coordinate reference system.
+
+        Returns:
+            ReferenceShape: type of shape
+        """
+        return self.__ref_shape
+
+    @property
+    def crs_type(self) -> CrsType:
+        """Type of coordinate reference system.
+
+        Returns:
+            CrsType: type of coordinate reference system
+        """
+        return CrsType.OCENTRIC
+
+    @property
+    def crs(self) -> BodyCrs:
+        """Coordinate reference system of the body.
+
+        Returns:
+            BodyCrs: coordinate reference system of the body
+        """
+        return self.__crs
+
+    def _create_body(self) -> IBody:
+        """Creates the description of the coordinate reference system for the
+        body.
+
+        Returns:
+            IBody: the coordinate reference system for the body
+        """
+        return IBody.create(
+            self.ref_shape,
+            self.row["Body"],
+            self.row["IAU2015_Semimajor"],
+            self.row["IAU2015_Semiminor"],
+            self.row["IAU2015_Axisb"],
+            self.row["IAU2015_Mean"],
+        )
+
+    def _create_datum(self, body: IBody) -> Datum:
+        """Creates the description of the datum related to the body.
+
+        Args:
+            body (IBody): the body
+
+        Returns:
+            Datum: the datum related to the body
+        """
+        anchor: Anchor = Anchor(
+            f"{self.row['origin_long_name']} : {self.row['origin_lon_pos']}"
+        )
+        return Datum.create(self.row["Body"], body, anchor)
+
+    def _create_crs(self, datum: Datum) -> BodyCrs:
+        """Creates a description of the planetocentric reference system based
+        on the datum.
+
+        Args:
+            datum (Datum): datum of the body
+
+        Returns:
+            BodyCrs: the planetocentric reference system based on the datum
+        """
+        return BodyCrs(
+            datum,
+            self.row["Naif_id"],
+            self.row["rotation"],
+            CrsType.OCENTRIC,
+        )
+
+    def _crs(self) -> BodyCrs:
+        """Creates a description of a planetocentric Coordinate Reference
+        System.
+
+        Returns:
+            BodyCrs: Coordinate Reference System description of the body
+        """
+        shape: IBody = self._create_body()
+        datum: Datum = self._create_datum(shape)
+        crs: BodyCrs = self._create_crs(datum)
+        return crs
+
+    def wkt(self) -> str:
+        """Returns the WKT of the coordinate reference system.
+
+        Returns:
+            str: the WKT of the coordinate reference system
+        """
+        return self.__crs.wkt()
+
+
+class Planetographic(Planetocentric):
+    """Computes the planetographic coordinate reference system."""
+
+    @property
+    def crs_type(self) -> CrsType:
+        """Type of coordinate reference system.
+
+        Returns:
+            CrsType: type of coordinate reference system
+        """
+        return CrsType.OGRAPHIC
+
+    def _create_crs(self, datum: Datum) -> BodyCrs:
+        """Creates a planetographic coordinate reference system based on a
+        datum.
+
+        Args:
+            datum (Datum): datum of the body
+
+        Returns:
+            BodyCrs: planetographic coordinate reference system
+        """
+        return BodyCrs(
+            datum,
+            self.row["Naif_id"],
+            self.row["rotation"],
+            CrsType.OGRAPHIC,
+        )
+
+
 class Conversion:
     """Projection elements."""
 
-    TEMPLATE_PARAMETER = """PARAMETER["$parameter_name",$parameter_value,
+    TEMPLATE_PARAMETER = """PARAMETER["$parameter_name", $parameter_value,
             $unit,
-            ID["$authority",$authority_code]]"""
+            ID["$authority", $authority_code]]"""
 
     TEMPLATE_CONVERSION = """CONVERSION["$conversion_name",
         METHOD["$method_name",
-            ID["$authority",$authority_code]],
+            ID["$authority", $authority_code]],
         $params],"""
 
     def __init__(
@@ -811,44 +984,44 @@ class ProjectionBody(ICrs):
     TEMPLATE_OCENTRIC_SPHERE = """PROJCRS["$projection_name",
     BASEGEOGCRS["$name ($version) $reference",
         $datum,
-        ID["IAU",$number_body,$version]],
+        ID["IAU", $number_body, $version]],
     $conversion
-    CS[Cartesian,2],
-        AXIS["$direction_name",$direction,
+    CS[Cartesian, 2],
+        AXIS["$direction_name", $direction,
             ORDER[1],
-            LENGTHUNIT["metre",1]],
-        AXIS["(N)",north,
+            LENGTHUNIT["metre", 1]],
+        AXIS["Northing (N)", north,
             ORDER[2],
-            LENGTHUNIT["metre",1]],
-    ID["IAU",$number,$version]]"""
+            LENGTHUNIT["metre", 1]],
+    ID["IAU", $number, $version]]"""
 
     TEMPLATE_OCENTRIC = """PROJCRS["$projection_name",
     BASEGEODCRS["$name ($version) $reference",
         $datum,
-        ID["IAU",$number_body,$version]],
+        ID["IAU", $number_body, $version]],
     $conversion
-    CS[Cartesian,2],
-        AXIS["$direction_name",$direction,
+    CS[Cartesian, 2],
+        AXIS["$direction_name", $direction,
             ORDER[1],
-            LENGTHUNIT["metre",1]],
-        AXIS["(N)",north,
+            LENGTHUNIT["metre", 1]],
+        AXIS["Northing (N)", north,
             ORDER[2],
-            LENGTHUNIT["metre",1]],
-    ID["IAU",$number,$version]]"""
+            LENGTHUNIT["metre", 1]],
+    ID["IAU", $number, $version]]"""
 
     TEMPLATE_OGRAPHIC = """PROJCRS["$projection_name",
     BASEGEOGCRS["$name ($version) $reference",
         $datum,
-        ID["IAU",$number_body,$version]],
+        ID["IAU", $number_body, $version]],
     $conversion
-    CS[Cartesian,2],
-        AXIS["$direction_name",$direction,
+    CS[Cartesian, 2],
+        AXIS["$direction_name", $direction,
             ORDER[1],
-            LENGTHUNIT["metre",1]],
-        AXIS["(N)",north,
+            LENGTHUNIT["metre", 1]],
+        AXIS["Northing (N)", north,
             ORDER[2],
-            LENGTHUNIT["metre",1]],
-    ID["IAU",$number,$version]]"""
+            LENGTHUNIT["metre", 1]],
+    ID["IAU", $number, $version]]"""
 
     def __init__(
         self, body_crs: BodyCrs, projection: List[str], template: str
@@ -896,22 +1069,22 @@ class ProjectionBody(ICrs):
             f"{self.body_crs.datum.body.name} ({IAU_REPORT.VERSION}) "
         )
         if (
-            self.body_crs.reference_body.shape
-            == ReferenceBodyCrs.ELLIPSE_OCENTRIC.shape  # pylint: disable=no-member
+            self.body_crs.crs_type == CrsType.OCENTRIC
+            and self.body_crs.datum.body.shape == ReferenceShape.SPHERE
         ):
             reference = (
                 projection
-                + "/ "
-                + self.body_crs.reference_body.reference
+                + "- "
+                + self.body_crs.datum.body.shape.value
+                + " / "
+                + self.body_crs.crs_type.value
                 + f"/ {self.projection[1]}"
             )
         else:
             reference = (
                 projection
-                + "- "
-                + self.body_crs.reference_body.shape
-                + " / "
-                + self.body_crs.reference_body.reference
+                + "/ "
+                + self.body_crs.crs_type.value
                 + f"/ {self.projection[1]}"
             )
         return reference
@@ -924,17 +1097,17 @@ class ProjectionBody(ICrs):
         """
         reference: str
         if (
-            self.body_crs.reference_body.shape
-            == ReferenceBodyCrs.ELLIPSE_OCENTRIC.shape  # pylint: disable=no-member
+            self.body_crs.crs_type == CrsType.OCENTRIC
+            and self.body_crs.datum.body.shape == ReferenceShape.SPHERE
         ):
-            reference = "/ " + self.body_crs.reference_body.reference
-        else:
             reference = (
                 "- "
-                + self.body_crs.reference_body.shape
+                + self.body_crs.datum.body.shape.value
                 + " / "
-                + self.body_crs.reference_body.reference
+                + self.body_crs.crs_type.value
             )
+        else:
+            reference = "/ " + self.body_crs.crs_type.value
         return reference
 
     @property
@@ -971,7 +1144,16 @@ class ProjectionBody(ICrs):
         Returns:
             int: the IAU code
         """
-        return self.body_crs.number + int(self.projection[0])
+        return self.body_crs.iau_code + int(self.projection[0])
+
+    @property
+    def datum(self) -> Datum:
+        """Datum.
+
+        :getter: Returns the datum
+        :type: Datum
+        """
+        return self.body_crs.datum
 
     @staticmethod
     def create(body_crs: BodyCrs, projection: List[str]) -> "ProjectionBody":
@@ -981,25 +1163,30 @@ class ProjectionBody(ICrs):
             body_crs (BodyCrs): body CRS description
             projection (List[str]): projection elements
 
+        Raises:
+            ValueError: Unknown CRS type
+
         Returns:
             ProjectionBody: projected CRS description
         """
         result: ProjectionBody
-        if body_crs.reference_body in [
-            ReferenceBodyCrs.ELLIPSE_OCENTRIC,
-            ReferenceBodyCrs.TRIAXIAL_OCENTRIC,
-        ]:
-            result = ProjectionBody(
-                body_crs, projection, ProjectionBody.TEMPLATE_OCENTRIC
-            )
-        elif body_crs.reference_body in [ReferenceBodyCrs.SPHERE_OCENTRIC]:
+        if (
+            body_crs.crs_type == CrsType.OCENTRIC
+            and body_crs.datum.body.shape == ReferenceShape.SPHERE
+        ):
             result = ProjectionBody(
                 body_crs, projection, ProjectionBody.TEMPLATE_OCENTRIC_SPHERE
             )
-        else:
+        elif body_crs.crs_type == CrsType.OCENTRIC:
+            result = ProjectionBody(
+                body_crs, projection, ProjectionBody.TEMPLATE_OCENTRIC
+            )
+        elif body_crs.crs_type == CrsType.OGRAPHIC:
             result = ProjectionBody(
                 body_crs, projection, ProjectionBody.TEMPLATE_OGRAPHIC
             )
+        else:
+            raise ValueError(f"Unknown CRS type: {CrsType}")
         return result
 
     def wkt(self) -> str:
@@ -1014,14 +1201,14 @@ class ProjectionBody(ICrs):
             name=self.body_crs.name,
             version=IAU_REPORT.VERSION,
             datum=self.body_crs.datum.wkt(),
-            number=self.body_crs.number + int(self.projection[0]),
-            number_body=self.body_crs.number,
+            number=self.body_crs.iau_code + int(self.projection[0]),
+            number_body=self.body_crs.iau_code,
             conversion=self.__conversion.wkt(),
             reference=self._create_reference(),
             direction=self.body_crs.direction,
-            direction_name="westing(W)"
+            direction_name="Westing (W)"
             if self.body_crs.direction == "west"
-            else "(E)",
+            else "Easting (E)",
         )
 
     @staticmethod

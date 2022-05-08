@@ -152,7 +152,6 @@ def run():
     except Exception as error:  # pylint: disable=broad-except
         logging.exception(error)
         sys.exit(1)
-    print("OK")
 
 
 if __name__ == "__main__":

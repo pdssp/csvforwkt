@@ -33,27 +33,21 @@ The workflow to generate the WKTs is described as follows:
         :Add this CRS in the list;
         if (is a body a Sphere?) then (yes)
         else (no)
-            :compute CRS planetocentric description with ellipsoid shape;
+            :compute planetocentric CRS;
             :Add this CRS in the list;
         endif
         if (is a body a Sphere and (historical reason or retrograde movement) ?) then (yes)
         else (no)
-            :Compute CRS planetographic;
+            :Compute planetographic CRS;
             :Add this CRS in the list;
         endif
     else (no)
         :Create planetocentric description for sphere using median radius\n for Interoperability case;
         :Add this CRS in the list;
-        if (is a body a Sphere?) then (yes)
-        else (no)
-            :compute CRS planetocentric description with ellipsoid shape;
-            :Add this CRS in the list;
-        endif
-        if (is a body a Sphere and (historical reason or retrograde movement) ?) then (yes)
-        else (no)
-            :Compute CRS planetographic;
-            :Add this CRS in the list;
-        endif
+        :compute planetocentric CRS;
+        :Add this CRS in the list;
+        :Compute planetographic CRS;
+        :Add this CRS in the list;
     endif
     :merge CRS;
     :Compute projected CRS;

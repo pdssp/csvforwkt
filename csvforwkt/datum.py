@@ -52,14 +52,14 @@ class Datum:
     """
 
     TEMPLATE = """DATUM["$datum_name ($version)",
-        $body$anchor],
-    PRIMEM["Reference Meridian", 0,
-        ANGLEUNIT["degree", 0.0174532925199433, ID["EPSG", 9122]]]"""
+    \t$body$anchor],
+    \tPRIMEM["Reference Meridian", 0,
+            ANGLEUNIT["degree", 0.0174532925199433, ID["EPSG", 9122]]]"""
 
     TEMPLATE_SPHERE = """DATUM["$datum_name ($version) - Sphere",
-        $body$anchor],
-    PRIMEM["Reference Meridian", 0,
-        ANGLEUNIT["degree", 0.0174532925199433, ID["EPSG", 9122]]]"""
+    \t$body$anchor],
+    \tPRIMEM["Reference Meridian", 0,
+            ANGLEUNIT["degree", 0.0174532925199433, ID["EPSG", 9122]]]"""
 
     def __init__(
         self, name: str, body: IBody, anchor: Anchor, template: str
@@ -79,7 +79,6 @@ class Datum:
 
     @staticmethod
     def create(
-        biaxial_body: ReferenceShape,
         name: str,
         body: IBody,
         anchor: Anchor,
@@ -87,7 +86,6 @@ class Datum:
         """Create a datum
 
         Args:
-            biaxial_body (ReferenceShape): type of shape
             name (str): datum name
             body (IBody): body description
             anchor (Anchor): anchor description
@@ -96,7 +94,7 @@ class Datum:
             Datum: datum description
         """
         result: Datum
-        if biaxial_body == ReferenceShape.SPHERE:
+        if body.shape == ReferenceShape.SPHERE:
             result = Datum(name, body, anchor, Datum.TEMPLATE_SPHERE)
         else:
             result = Datum(name, body, anchor, Datum.TEMPLATE)

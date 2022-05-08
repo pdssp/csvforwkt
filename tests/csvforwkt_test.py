@@ -160,6 +160,7 @@ def test_iau(data):
                 "Usemeanradiusassphereforinteroperability.",
             )
             .replace("UseR_m=(a+b+c)/3asmeanradius.", "")
+            .replace('AXIS["westing(W)', 'AXIS["(W)')
         )
         generated_wkt = (
             generated_wkt.replace("\t", "")
@@ -211,6 +212,12 @@ def test_iau(data):
             .replace("withW0=0:0", "withW0=0:0.0")
             .replace("Afon:0", "Afon:0.0")
             .replace("Charax:0", "Charax:0.0")
+            .replace('AXIS["Easting(E)"', 'AXIS["(E)"')
+            .replace('AXIS["Northing(N)"', 'AXIS["(N)"')
+            .replace('AXIS["Westing(W)', 'AXIS["(W)')
+            .replace('AXIS["westing(W)', 'AXIS["(W)')
+            # .replace("Easting", "")
+            # .replace("Northing", "")
         )
         # print(generated_wkt)
         # print(iau_wkt_proj)

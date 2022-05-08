@@ -337,7 +337,7 @@ class Sphere(IBody):
 class Triaxial(IBody):
     """A triaxial shape."""
 
-    TEMPLATE = """TRIAXIAL["ellipsoide_name ($version)", $semi_major, $semi_median, $semi_minor,
+    TEMPLATE = """TRIAXIAL["$ellipsoide_name ($version)", $semi_major, $semi_median, $semi_minor,
 \t\tLENGTHUNIT["metre", 1, ID["EPSG", 9001]]]"""
 
     def __init__(

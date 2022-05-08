@@ -1,4 +1,14 @@
-### Add triaxial bodies Improve axis description Update the documentation (HEAD -> main)
+### Fix name for triaxial bodies (HEAD -> main)
+>Sun, 8 May 2022 02:50:18 +0200
+
+>Author: Jean-Christophe Malapert (jean-christophe.malapert@cnes.fr)
+
+>Commiter: Jean-Christophe Malapert (jean-christophe.malapert@cnes.fr)
+
+
+
+
+### Add triaxial bodies Improve axis description Update the documentation (origin/main)
 >Sun, 8 May 2022 02:33:56 +0200
 
 >Author: Jean-Christophe Malapert (jean-christophe.malapert@cnes.fr)
@@ -8,7 +18,7 @@
 
 
 
-### Update the documentation (origin/main)
+### Update the documentation
 >Wed, 4 May 2022 00:23:25 +0200
 
 >Author: Jean-Christophe Malapert (jean-christophe.malapert@cnes.fr)

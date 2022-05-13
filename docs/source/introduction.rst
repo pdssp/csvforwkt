@@ -68,7 +68,7 @@ IAU provides the physical parameters for the oribits and the definition of
 the coordinate reference system.
 
 The plysical parameters are transformed by USGS as CSV file. In addition,
-USGS provide a mechanism of identifiers according to the following inputs :
+USGS provides a mechanism of identifiers according to the following inputs :
 body, reference frame of the body and projected reference frame
 
 OGC provides the standard for describing the coordinate reference systems.

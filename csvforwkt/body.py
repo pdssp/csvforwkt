@@ -105,6 +105,14 @@ class IBody(metaclass=ABCMeta):
     ) -> "IBody":
         """Create a shape.
 
+        Rules to compute the sphere radius:
+        * mean = -1 => Use R_m = (a+b+c)/3 as mean radius
+        * semi major = -1 or semi minor = -1 => Use mean radius as sphere radius
+        * semi major < semi minor => Use mean radius as sphere radius
+        * triaxial bodies => Use mean radius as sphere radius
+        * semi major = semi minor = axis b => Use mean radius
+        * biaxial bodies => Use semi major as sphere radius
+
         Args:
             shape (ReferenceShape): type of shape
             name (str): name of the shape
@@ -126,17 +134,29 @@ class IBody(metaclass=ABCMeta):
         if shape == ReferenceShape.SPHERE:
             if mean == -1:
                 mean_radius = (semi_major + semi_minor + axisb) / 3
-                warning = "Use R_m = (a+b+c)/3 as mean radius. Use mean radius as sphere for interoperability. "
-            elif axisb not in (semi_major, semi_minor):
+                warning = "Use R_m = (a+b+c)/3 as mean radius. Use mean radius as sphere radius for interoperability. "
+            elif semi_major == -1 or semi_minor == -1:
                 mean_radius = mean
-                warning = "Use mean radius as sphere for interoperability. "
-            elif semi_major == axisb and semi_minor == axisb:
+                warning = (
+                    "Use mean radius as sphere radius for interoperability. "
+                )
+            elif semi_major < semi_minor:  # Hartley case
+                mean_radius = mean
+                warning = (
+                    "Use mean radius as sphere radius for interoperability. "
+                )
+            elif axisb not in (semi_major, semi_minor):  # Triaxial case
+                mean_radius = mean
+                warning = (
+                    "Use mean radius as sphere radius for interoperability. "
+                )
+            elif (
+                semi_major == axisb and semi_minor == axisb
+            ):  # Sun or moon case (No approximation)
                 mean_radius = mean
             else:
-                mean_radius = semi_major
-                warning = (
-                    "Use semi-major radius as sphere for interoperability. "
-                )
+                mean_radius = semi_major  # Biaxial case
+                warning = "Use semi-major radius as sphere radius for interoperability. "
             result = Sphere(name, mean_radius)
         elif shape == ReferenceShape.ELLIPSE:
             inverse_flat: float

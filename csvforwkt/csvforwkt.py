@@ -118,11 +118,13 @@ class CsvforwktLib:
         return pd.read_csv(self.iau_report)
 
     def _skip_records(self):
-        """Skip records when IAU2015_Semimajor != -1 and IAU2015_Axisb != -1 and IAU2015_Semiminor != -1"""
+        """Skip records when not (IAU2015_Semimajor == -1 and IAU2015_Axisb == -1 and IAU2015_Semiminor == -1)"""
         nb_records: int = self.__df_bodies.shape[0]
-        self.__df_bodies = self.__df_bodies.query(
-            "IAU2015_Semimajor != -1 and IAU2015_Axisb != -1 and IAU2015_Semiminor != -1"
+        query_result = self.__df_bodies.query(
+            "IAU2015_Semimajor == -1 and IAU2015_Axisb == -1 and IAU2015_Semiminor == -1"
         )
+        idx2 = self.__df_bodies.index.difference(query_result.index)
+        self.__df_bodies = self.__df_bodies.iloc[idx2]
         nb_records_for_processing: int = self.__df_bodies.shape[0]
         nb_records_skip: int = nb_records - nb_records_for_processing
         logger.info(f"\t\t{nb_records_skip} records have been skipped")
@@ -166,6 +168,19 @@ class CsvforwktLib:
             and row["IAU2015_Semimajor"] == row["IAU2015_Axisb"]
         )
 
+    def _is_valid_flatenning(self, row: pd.Series):
+        """Check if the flatenning is valid.
+
+        The verification is done by checking  IAU2015_Semimajor with IAU2015_Semiminor:
+
+        Args:
+            row (pd.Series): current body description
+
+        Returns:
+            bool: True when the IAU2015_Semimajor >=  IAU2015_Semiminor
+        """
+        return row["IAU2015_Semimajor"] >= row["IAU2015_Semiminor"]
+
     def _is_retrograde(  # pylint: disable=no-self-use
         self, row: pd.Series
     ) -> bool:
@@ -204,6 +219,9 @@ class CsvforwktLib:
           planetographic is not needed because the planetographic = planetocentric
           else plantetographic description is created
 
+        Specific rule when semi_major_axis < semi_minor_axis:
+        * Only sphere is used as mean_radius as radius
+
         Args:
             body (pd.DataFrame): bodies
             ref_shape (ReferenceShape): Type of the shape
@@ -215,13 +233,13 @@ class CsvforwktLib:
         for _, row in body.iterrows():
             sphere_crs = Planetocentric(row, ReferenceShape.SPHERE)
             crs[sphere_crs.crs.iau_code] = sphere_crs.crs
-            if not self._is_sphere(row):
+            if not self._is_sphere(row) and self._is_valid_flatenning(row):
                 ocentric_crs = Planetocentric(row, ReferenceShape.ELLIPSE)
                 crs[ocentric_crs.crs.iau_code] = ocentric_crs.crs
             if not (
                 self._is_sphere(row)
                 and (self._is_retrograde(row) or self._is_historic(row))
-            ):
+            ) and self._is_valid_flatenning(row):
                 ographic = Planetographic(row, ReferenceShape.ELLIPSE)
                 crs[ographic.crs.iau_code] = ographic.crs
         logger.info(f"\t\tNumber of processed bodies: {len(crs.keys())}")

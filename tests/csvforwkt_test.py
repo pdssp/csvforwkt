@@ -133,13 +133,7 @@ def test_iau(data):
         iau_prj[id] = wkt
 
     for key in iau_prj.keys():
-        if key >= 100000500 and key <= 100000585:  # ignored
-            continue
         if key >= 100003600 and key <= 100003685:  # Halley
-            continue
-        if key >= 100004100 and key <= 100004185:  # Hartley 2
-            continue
-        if key >= 100009300 and key <= 100009385:  # Tempel 1 - ignored
             continue
         if key >= 200021600 and key <= 200021685:  # remark
             continue
@@ -149,7 +143,7 @@ def test_iau(data):
             continue
         iau_wkt_proj = iau_prj[key]
         generated_wkt = pytest.crs[key].wkt()
-        print(generated_wkt)
+        # print(generated_wkt)
         # print(iau_wkt_proj)
         iau_wkt_proj = (
             iau_wkt_proj.replace("\t", "")
@@ -159,6 +153,12 @@ def test_iau(data):
                 "Usemeanradiusassphereradiusforinteroperability.",
                 "Usemeanradiusassphereforinteroperability.",
             )
+            .replace(
+                "usassphereforinteroperability.",
+                "usassphereradiusforinteroperability.",
+            )
+            .replace("argelobe:0.0", "argelobe:0")
+            .replace("pactsite:0.0", "pactsite:0")
             .replace("UseR_m=(a+b+c)/3asmeanradius.", "")
             .replace('AXIS["westing(W)', 'AXIS["(W)')
         )
@@ -221,5 +221,5 @@ def test_iau(data):
         )
         # print(generated_wkt)
         # print(iau_wkt_proj)
-        print(f"IAU code: {key}")
-        assert iau_wkt_proj == generated_wkt
+        # print(f"IAU code: {key}")
+        assert iau_wkt_proj == generated_wkt, f"IAU code: {key}"

@@ -23,7 +23,7 @@ def pytest_namespace():
 def data():
     iau_data = "data/naifcodes_radii_m_wAsteroids_IAU2015.csv"
     iau_version = 2015
-    iau_doi = "doi://10.1007/s10569-017-9805-5"
+    iau_doi = "https://doi.org/10.1007/s10569-017-9805-5"
     csv2wkt = CsvforwktLib(iau_data, iau_version, iau_doi, "/tmp")
     pytest.crs = csv2wkt.process()
 

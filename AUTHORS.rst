@@ -11,3 +11,4 @@ Contributors
 ------------
 
 * Trent Hare <thare@usgs.gov>
+* Benoît Seignovert <benoit.seignovert@univ-nantes.fr>

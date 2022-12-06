@@ -19,6 +19,6 @@ Running the software
 
 .. code-block:: shell
 
-    csvforwkt --iau_report data/naifcodes_radii_m_wAsteroids_IAU2015.csv --iau_version 2015 --iau_doi doi://10.1007/s10569-017-9805-5
+    csvforwkt --iau_report data/naifcodes_radii_m_wAsteroids_IAU2015.csv --iau_version 2015 --iau_doi https://doi.org/10.1007/s10569-017-9805-5
 
 This will generate the file iau.wkt with all WKTs.

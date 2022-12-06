@@ -95,7 +95,7 @@ To use csvForWKT:
     .. code-block:: console
 
         $ make
-        $ csvforwkt --iau_report data/naifcodes_radii_m_wAsteroids_IAU2015.csv --iau_version 2015 --iau_doi doi://10.1007/s10569-017-9805-5
+        $ csvforwkt --iau_report data/naifcodes_radii_m_wAsteroids_IAU2015.csv --iau_version 2015 --iau_doi https://doi.org/10.1007/s10569-017-9805-5
 
 
 Run tests

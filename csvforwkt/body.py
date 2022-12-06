@@ -13,7 +13,7 @@ class IAU_REPORT:  # pylint: disable=invalid-name,too-few-public-methods
     """Version of the IAU report."""
 
     VERSION: str = "2015"
-    DOI_IAU: str = "doi://10.1007/s10569-017-9805-5"
+    DOI_IAU: str = "https://doi.org/10.1007/s10569-017-9805-5"
     SOURCE_IAU: str = "Source of IAU Coordinate systems: " + DOI_IAU
 
 

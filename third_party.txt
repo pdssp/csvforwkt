@@ -17,7 +17,7 @@ pip-licenses
  charset-normalizer             2.1.1                         MIT License
  click                          7.1.2                         BSD License
  coverage                       6.2                           Apache Software License
- csvforwkt                      0.1.dev12+gb999ad3.d20221224  GNU General Public License v3 (GPLv3)GNU Lesser General Public License v3 (LGPLv3)
+ csvforwkt                      0.1.dev13+ge13c255.d20221224  GNU General Public License v3 (GPLv3)GNU Lesser General Public License v3 (LGPLv3)
  distlib                        0.3.6                         Python Software Foundation License
  docutils                       0.17.1                        BSD License; GNU General Public License (GPL); Public Domain; Python Software Foundation License
  filelock                       3.8.2                         The Unlicense (Unlicense)

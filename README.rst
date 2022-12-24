@@ -106,6 +106,12 @@ Run tests
         $ make tests
 
 
+Workflow Changes
+----------------
+
+- Make a pull request to the project
+- If the pull request is accepted, the project maintener will create a pull request on https://github.com/OSGeo/PROJ/blob/5e8ce5c1f829e8b483165c9d1fe506dc142e3bf8/scripts/build_db_from_iau.py
+
 
 Author
 ------
@@ -115,6 +121,7 @@ Author
 Contributors
 ------------
 👤 **Trent Hare**
+👤 **Benoit Seignovert**
 
 
 🤝 Contributing

@@ -132,7 +132,7 @@ csvforwkt-env/
 
 docs/build/
 
-docs/source/_static/report.html
+docs/source/assets/report.html
 
 .csvforwkt/
 tests/iau.wkt

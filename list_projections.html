@@ -1,0 +1,437 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Table of projections &#8212; csvForWKT 0.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="_static/my-styles.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js "></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html"><span><img src="_static/logo.png"></span>
+          csvForWKT library</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.2</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="https://github.com/pole-surfaces-planetaires/csvforwkt">Git</a></li>
+                <li><a href="_static/report.html">Tests</a></li>
+                <li><a href="_static/coverage/index.html">Coverage</a></li>
+                <li><a href="glossary.html">Glossary</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Packages <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="history.html">CHANGELOG</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Terms, definitions and abbreviated terms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#purpose">Purpose</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#context">Context</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="purpose.html">Purpose of the Software</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="purpose.html#module-csvforwkt">Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="purpose.html#module-csvforwkt.crs">Positive longitudes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="purpose.html#list-of-projections">List of projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="purpose.html#how-the-iau-code-is-created">How the IAU code is created</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="getting_starting.html">Getting starting</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting_starting.html#install">Install</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_starting.html#running-the-software">Running the software</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Section <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Table of projections</a></li>
+<li><a class="reference internal" href="#detailed-description-for-equirectangular-clon-0">Detailed description for Equirectangular, clon = 0</a></li>
+<li><a class="reference internal" href="#detailed-description-for-equirectangular-clon-180">Detailed description for Equirectangular, clon = 180</a></li>
+<li><a class="reference internal" href="#detailed-description-for-sinusoidal-clon-0">Detailed description for Sinusoidal, clon = 0</a></li>
+<li><a class="reference internal" href="#detailed-description-for-sinusoidal-clon-180">Detailed description for Sinusoidal, clon = 180</a></li>
+<li><a class="reference internal" href="#detailed-description-for-north-polar">Detailed description for North Polar</a></li>
+<li><a class="reference internal" href="#detailed-description-for-south-polar">Detailed description for South Polar</a></li>
+<li><a class="reference internal" href="#detailed-description-for-mollweide-clon-0">Detailed description for Mollweide, clon = 0</a></li>
+<li><a class="reference internal" href="#detailed-description-for-mollweide-clon-180">Detailed description for Mollweide, clon = 180</a></li>
+<li><a class="reference internal" href="#detailed-description-for-robinson-clon-0">Detailed description for Robinson, clon = 0</a></li>
+<li><a class="reference internal" href="#detailed-description-for-robinson-clon-180">Detailed description for Robinson, clon = 180</a></li>
+<li><a class="reference internal" href="#detailed-description-for-tranverse-mercator">Detailed description for Tranverse Mercator</a></li>
+<li><a class="reference internal" href="#detailed-description-for-orthographic-clon-0">Detailed description for Orthographic, clon = 0</a></li>
+<li><a class="reference internal" href="#detailed-description-for-orthographic-clon-180">Detailed description for Orthographic, clon = 180</a></li>
+<li><a class="reference internal" href="#detailed-description-for-lambert-conic-conformal">Detailed description for Lambert Conic Conformal</a></li>
+<li><a class="reference internal" href="#detailed-description-for-lambert-azimuthal-equal-area">Detailed description for Lambert Azimuthal Equal Area</a></li>
+<li><a class="reference internal" href="#detailed-description-for-albers-equal-area">Detailed description for Albers Equal Area</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/list_projections.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <section id="table-of-projections">
+<h1>Table of projections<a class="headerlink" href="#table-of-projections" title="Permalink to this headline">¶</a></h1>
+<table class="docutils align-default" id="id17">
+<caption><span class="caption-text">Projections</span><a class="headerlink" href="#id17" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Code</p></th>
+<th class="head"><p>Projection name</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>10</p></td>
+<td><p><a class="reference internal" href="purpose.html#id1"><span class="std std-ref">Equirectangular, clon = 0</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>15</p></td>
+<td><p><a class="reference internal" href="purpose.html#id2"><span class="std std-ref">Equirectangular, clon = 180</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>20</p></td>
+<td><p><a class="reference internal" href="purpose.html#id3"><span class="std std-ref">Sinusoidal, clon = 0</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>25</p></td>
+<td><p><a class="reference internal" href="purpose.html#id4"><span class="std std-ref">Sinusoidal, clon = 180</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>30</p></td>
+<td><p><a class="reference internal" href="purpose.html#id5"><span class="std std-ref">North Polar</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>35</p></td>
+<td><p><a class="reference internal" href="purpose.html#id6"><span class="std std-ref">South Polar</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>40</p></td>
+<td><p><a class="reference internal" href="purpose.html#id7"><span class="std std-ref">Mollweide, clon = 0</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>45</p></td>
+<td><p><a class="reference internal" href="purpose.html#id8"><span class="std std-ref">Mollweide, clon = 180</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>50</p></td>
+<td><p><a class="reference internal" href="purpose.html#id9"><span class="std std-ref">Robinson, clon = 0</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>55</p></td>
+<td><p><a class="reference internal" href="purpose.html#id10"><span class="std std-ref">Robinson, clon = 180</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>60</p></td>
+<td><p><a class="reference internal" href="purpose.html#id11"><span class="std std-ref">Tranverse Mercator</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>65</p></td>
+<td><p><a class="reference internal" href="purpose.html#id12"><span class="std std-ref">Orthographic, clon = 0</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>70</p></td>
+<td><p><a class="reference internal" href="purpose.html#id13"><span class="std std-ref">Orthographic, clon = 180</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>75</p></td>
+<td><p><a class="reference internal" href="purpose.html#id14"><span class="std std-ref">Lambert Conic Conformal</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>80</p></td>
+<td><p><a class="reference internal" href="purpose.html#id15"><span class="std std-ref">Lambert Azimuthal Equal Area</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>85</p></td>
+<td><p><a class="reference internal" href="purpose.html#id16"><span class="std std-ref">Albers Equal Area</span></a></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="detailed-description-for-equirectangular-clon-0">
+<span id="id1"></span><h1>Detailed description for Equirectangular, clon = 0<a class="headerlink" href="#detailed-description-for-equirectangular-clon-0" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p>Projection code: 10</p></li>
+<li><p>Projection name: Equirectangular, clon = 0</p></li>
+<li><p>Projection method: Equidistant Cylindrical</p></li>
+<li><p>Latitude of 1st standard parallel: 0</p></li>
+<li><p>Longitude of natural origin: 0</p></li>
+<li><p>False easting: 0</p></li>
+<li><p>False northing: 0</p></li>
+</ul>
+</section>
+<section id="detailed-description-for-equirectangular-clon-180">
+<span id="id2"></span><h1>Detailed description for Equirectangular, clon = 180<a class="headerlink" href="#detailed-description-for-equirectangular-clon-180" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p>Projection code: 15</p></li>
+<li><p>Projection name: Equirectangular, clon = 180</p></li>
+<li><p>Projection method: Equidistant Cylindrical</p></li>
+<li><p>Latitude of 1st standard parallel: 0</p></li>
+<li><p>Longitude of natural origin: 180</p></li>
+<li><p>False easting: 0</p></li>
+<li><p>False northing: 0</p></li>
+</ul>
+</section>
+<section id="detailed-description-for-sinusoidal-clon-0">
+<span id="id3"></span><h1>Detailed description for Sinusoidal, clon = 0<a class="headerlink" href="#detailed-description-for-sinusoidal-clon-0" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p>Projection code: 20</p></li>
+<li><p>Projection name: Sinusoidal, clon = 0</p></li>
+<li><p>Projection method: Sinusoidal</p></li>
+<li><p>Longitude of natural origin: 0</p></li>
+<li><p>False easting: 0</p></li>
+<li><p>False northing: 0</p></li>
+<li><p>None: None</p></li>
+</ul>
+</section>
+<section id="detailed-description-for-sinusoidal-clon-180">
+<span id="id4"></span><h1>Detailed description for Sinusoidal, clon = 180<a class="headerlink" href="#detailed-description-for-sinusoidal-clon-180" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p>Projection code: 25</p></li>
+<li><p>Projection name: Sinusoidal, clon = 180</p></li>
+<li><p>Projection method: Sinusoidal</p></li>
+<li><p>Longitude of natural origin: 180</p></li>
+<li><p>False easting: 0</p></li>
+<li><p>False northing: 0</p></li>
+<li><p>None: None</p></li>
+</ul>
+</section>
+<section id="detailed-description-for-north-polar">
+<span id="id5"></span><h1>Detailed description for North Polar<a class="headerlink" href="#detailed-description-for-north-polar" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p>Projection code: 30</p></li>
+<li><p>Projection name: North Polar</p></li>
+<li><p>Projection method: Polar Stereographic (variant A)</p></li>
+<li><p>Latitude of natural origin: 90</p></li>
+<li><p>Longitude of natural origin: 0</p></li>
+<li><p>Scale factor at natural origin: 1</p></li>
+<li><p>False easting: 0</p></li>
+<li><p>False northing: 0</p></li>
+</ul>
+</section>
+<section id="detailed-description-for-south-polar">
+<span id="id6"></span><h1>Detailed description for South Polar<a class="headerlink" href="#detailed-description-for-south-polar" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p>Projection code: 35</p></li>
+<li><p>Projection name: South Polar</p></li>
+<li><p>Projection method: Polar Stereographic (variant A)</p></li>
+<li><p>Latitude of natural origin: -90</p></li>
+<li><p>Longitude of natural origin: 0</p></li>
+<li><p>Scale factor at natural origin: 1</p></li>
+<li><p>False easting: 0</p></li>
+<li><p>False northing: 0</p></li>
+</ul>
+</section>
+<section id="detailed-description-for-mollweide-clon-0">
+<span id="id7"></span><h1>Detailed description for Mollweide, clon = 0<a class="headerlink" href="#detailed-description-for-mollweide-clon-0" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p>Projection code: 40</p></li>
+<li><p>Projection name: Mollweide, clon = 0</p></li>
+<li><p>Projection method: Mollweide</p></li>
+<li><p>Longitude of natural origin: 0</p></li>
+<li><p>False easting: 0</p></li>
+<li><p>False northing: 0</p></li>
+<li><p>None: None</p></li>
+</ul>
+</section>
+<section id="detailed-description-for-mollweide-clon-180">
+<span id="id8"></span><h1>Detailed description for Mollweide, clon = 180<a class="headerlink" href="#detailed-description-for-mollweide-clon-180" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p>Projection code: 45</p></li>
+<li><p>Projection name: Mollweide, clon = 180</p></li>
+<li><p>Projection method: Mollweide</p></li>
+<li><p>Longitude of natural origin: 180</p></li>
+<li><p>False easting: 0</p></li>
+<li><p>False northing: 0</p></li>
+<li><p>None: None</p></li>
+</ul>
+</section>
+<section id="detailed-description-for-robinson-clon-0">
+<span id="id9"></span><h1>Detailed description for Robinson, clon = 0<a class="headerlink" href="#detailed-description-for-robinson-clon-0" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p>Projection code: 50</p></li>
+<li><p>Projection name: Robinson, clon = 0</p></li>
+<li><p>Projection method: Robinson</p></li>
+<li><p>Longitude of natural origin: 0</p></li>
+<li><p>False easting: 0</p></li>
+<li><p>False northing: 0</p></li>
+<li><p>None: None</p></li>
+</ul>
+</section>
+<section id="detailed-description-for-robinson-clon-180">
+<span id="id10"></span><h1>Detailed description for Robinson, clon = 180<a class="headerlink" href="#detailed-description-for-robinson-clon-180" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p>Projection code: 55</p></li>
+<li><p>Projection name: Robinson, clon = 180</p></li>
+<li><p>Projection method: Robinson</p></li>
+<li><p>Longitude of natural origin: 180</p></li>
+<li><p>False easting: 0</p></li>
+<li><p>False northing: 0</p></li>
+<li><p>None: None</p></li>
+</ul>
+</section>
+<section id="detailed-description-for-tranverse-mercator">
+<span id="id11"></span><h1>Detailed description for Tranverse Mercator<a class="headerlink" href="#detailed-description-for-tranverse-mercator" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p>Projection code: 60</p></li>
+<li><p>Projection name: Tranverse Mercator</p></li>
+<li><p>Projection method: Transverse Mercator</p></li>
+<li><p>Latitude of natural origin: 0</p></li>
+<li><p>Longitude of natural origin: 0</p></li>
+<li><p>Scale factor at natural origin: 1</p></li>
+<li><p>False easting: 0</p></li>
+<li><p>False northing: 0</p></li>
+</ul>
+</section>
+<section id="detailed-description-for-orthographic-clon-0">
+<span id="id12"></span><h1>Detailed description for Orthographic, clon = 0<a class="headerlink" href="#detailed-description-for-orthographic-clon-0" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p>Projection code: 65</p></li>
+<li><p>Projection name: Orthographic, clon = 0</p></li>
+<li><p>Projection method: Orthographic</p></li>
+<li><p>Latitude of natural origin: 0</p></li>
+<li><p>Longitude of natural origin: 0</p></li>
+<li><p>False easting: 0</p></li>
+<li><p>False northing: 0</p></li>
+</ul>
+</section>
+<section id="detailed-description-for-orthographic-clon-180">
+<span id="id13"></span><h1>Detailed description for Orthographic, clon = 180<a class="headerlink" href="#detailed-description-for-orthographic-clon-180" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p>Projection code: 70</p></li>
+<li><p>Projection name: Orthographic, clon = 180</p></li>
+<li><p>Projection method: Orthographic</p></li>
+<li><p>Latitude of natural origin: 0</p></li>
+<li><p>Longitude of natural origin: 180</p></li>
+<li><p>False easting: 0</p></li>
+<li><p>False northing: 0</p></li>
+</ul>
+</section>
+<section id="detailed-description-for-lambert-conic-conformal">
+<span id="id14"></span><h1>Detailed description for Lambert Conic Conformal<a class="headerlink" href="#detailed-description-for-lambert-conic-conformal" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p>Projection code: 75</p></li>
+<li><p>Projection name: Lambert Conic Conformal</p></li>
+<li><p>Projection method: Lambert Conic Conformal (2SP)</p></li>
+<li><p>Latitude of false origin: 40</p></li>
+<li><p>Longitude of false origin: 0</p></li>
+<li><p>Latitude of 1st standard parallel: 20</p></li>
+<li><p>Latitude of 2nd standard parallel: 60</p></li>
+<li><p>Easting at false origin: 0</p></li>
+<li><p>Northing at false origin: 0</p></li>
+</ul>
+</section>
+<section id="detailed-description-for-lambert-azimuthal-equal-area">
+<span id="id15"></span><h1>Detailed description for Lambert Azimuthal Equal Area<a class="headerlink" href="#detailed-description-for-lambert-azimuthal-equal-area" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p>Projection code: 80</p></li>
+<li><p>Projection name: Lambert Azimuthal Equal Area</p></li>
+<li><p>Projection method: Lambert Azimuthal Equal Area</p></li>
+<li><p>Latitude of natural origin: 40</p></li>
+<li><p>Longitude of natural origin: 0</p></li>
+<li><p>False easting: 0</p></li>
+<li><p>False northing: 0</p></li>
+</ul>
+</section>
+<section id="detailed-description-for-albers-equal-area">
+<span id="id16"></span><h1>Detailed description for Albers Equal Area<a class="headerlink" href="#detailed-description-for-albers-equal-area" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p>Projection code: 85</p></li>
+<li><p>Projection name: Albers Equal Area</p></li>
+<li><p>Projection method: Albers Equal Area</p></li>
+<li><p>Latitude of false origin: 40</p></li>
+<li><p>Longitude of false origin: 0</p></li>
+<li><p>Latitude of 1st standard parallel: 20</p></li>
+<li><p>Latitude of 2nd standard parallel: 60</p></li>
+<li><p>Easting at false origin: 0</p></li>
+<li><p>Northing at false origin: 0</p></li>
+</ul>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+  <!--<h2>My footer of awesomeness.</h2>-->
+  
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2022 - CNES (Jean-Christophe Malapert for Pôle Surfaces Planétaires).<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br/>
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

@@ -103,7 +103,7 @@ Run tests
 
 .. code-block:: console
 
-        $make tests
+        $ make tests
 
 
 

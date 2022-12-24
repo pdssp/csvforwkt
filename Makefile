@@ -19,7 +19,6 @@ Usage:\n
 	-------------------------------------------------------------------------\n
 	make prepare-dev\t\t 		Prepare Development environment\n
 	make install-dev\t\t 		Install COTS and csvforwkt for development purpose\n
-	make data\t\t\t				Download data\n
 	make tests\t\t\t             Run units and integration tests\n
 	\n
 	make doc\t\t\t 				Generate the documentation\n
@@ -117,9 +116,6 @@ release:
 
 version:
 	python3 setup.py --version
-
-data:
-	pip install -r requirements_data.txt && python scripts/data_download.py
 
 upload-test-pypi:
 	flit publish --repository pypitest

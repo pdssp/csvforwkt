@@ -113,6 +113,14 @@ def test_color_formatter():
 
 
 def test_iau(data):
+    """Test the library output with the GDAL output.
+
+    Also fix :
+      - some number with float precision between GDAL and library output
+      - some extra spaces
+      - the DOI URL by waiting we regenerate the DOI URL with GDAL
+
+    """
     import re
 
     iau_prj = {}
@@ -125,6 +133,7 @@ def test_iau(data):
     for wkt in wkts:
         iau_line_regexo = '"IAU",(.*),2015'
         m = re.findall(iau_line_regexo, wkt)
+        # print(f"{m} -> {wkt}")
         id: int
         if len(m) > 1:
             id = int(m[1])
@@ -143,8 +152,6 @@ def test_iau(data):
             continue
         iau_wkt_proj = iau_prj[key]
         generated_wkt = pytest.crs[key].wkt()
-        # print(generated_wkt)
-        # print(iau_wkt_proj)
         iau_wkt_proj = (
             iau_wkt_proj.replace("\t", "")
             .replace(" ", "")
@@ -216,6 +223,10 @@ def test_iau(data):
             .replace('AXIS["Northing(N)"', 'AXIS["(N)"')
             .replace('AXIS["Westing(W)', 'AXIS["(W)')
             .replace('AXIS["westing(W)', 'AXIS["(W)')
+            .replace(
+                "https://doi.org/10.1007/s10569-017-9805-5",
+                "doi://10.1007/s10569-017-9805-5",
+            )
             # .replace("Easting", "")
             # .replace("Northing", "")
         )

@@ -1,4 +1,14 @@
-### Fix DOI resolver pattern for full URL (HEAD -> fix-doi-url)
+### Fix precomit Fix docs Fix tests Remove useless file (HEAD -> main)
+>Sat, 24 Dec 2022 14:37:18 +0100
+
+>Author: Jean-Christophe Malapert (jean-chrsitophe.malapert@cnes.fr)
+
+>Commiter: Jean-Christophe Malapert (jean-chrsitophe.malapert@cnes.fr)
+
+
+
+
+### Fix DOI resolver pattern for full URL
 >Tue, 6 Dec 2022 16:58:07 +0100
 
 >Author: Benoit Seignovert (benoit.seignovert@univ-nantes.fr)
@@ -8,7 +18,7 @@
 
 
 
-### Add pandas in requirements.txt Update to python 3.10 Fix the calculation of the radius when the approxmation is selected. (origin/main, origin/HEAD, main)
+### Add pandas in requirements.txt Update to python 3.10 Fix the calculation of the radius when the approxmation is selected.
 >Tue, 11 Oct 2022 00:02:05 +0200
 
 >Author: Jean-Christophe Malapert (Jean-christophe.malapert@cnes.fr)

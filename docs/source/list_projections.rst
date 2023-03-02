@@ -38,6 +38,8 @@ Table of projections
       - :ref:`Lambert Azimuthal Equal Area<80>`
     * - 85
       - :ref:`Albers Equal Area<85>`
+    * - 90
+      - :ref:`Popular Visualisation Pseudo Mercator<90>`
 
 
 .. _10:
@@ -238,3 +240,16 @@ Detailed description for Albers Equal Area
 * Latitude of 2nd standard parallel: 60
 * Easting at false origin: 0
 * Northing at false origin: 0
+
+.. _90:
+
+Detailed description for Popular Visualisation Pseudo Mercator
+-----------------------------------------------------
+* Projection code: 90
+* Projection name: Popular Visualisation Pseudo Mercator
+* Projection method: Popular Visualisation Pseudo Mercator
+* Latitude of natural origin: 0
+* Longitude of natural origin: 0
+* False easting: 0
+* False northing: 0
+

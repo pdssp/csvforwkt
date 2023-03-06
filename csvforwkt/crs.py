@@ -912,7 +912,7 @@ class ProjectionBody(ICrs):
         [
             90,
             "Popular Visualisation Pseudo-Mercator",
-            "Popular Visualisation Pseudo-Mercator",
+            "Popular Visualisation Pseudo Mercator",
             "Latitude of natural origin",
             0,
             "Longitude of natural origin",

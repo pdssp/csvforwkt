@@ -909,6 +909,23 @@ class ProjectionBody(ICrs):
             "Northing at false origin",
             0,
         ],
+        [
+            90,
+            "Popular Visualisation Pseudo-Mercator",
+            "Popular Visualisation Pseudo Mercator",
+            "Latitude of natural origin",
+            0,
+            "Longitude of natural origin",
+            0,
+            "False easting",
+            0,
+            "False northing",
+            0,
+            None,
+            None,
+            None,
+            None,
+        ],
     ]
 
     METHOD_AND_PARAM_MAPPING: Dict[str, List] = {
@@ -979,6 +996,7 @@ class ProjectionBody(ICrs):
         "Lambert Azimuthal Equal Area": ["EPSG", 9820],
         "Albers Equal Area": ["EPSG", 9822],
         "Orthographic": ["EPSG", 9840],
+        "Popular Visualisation Pseudo Mercator": ["EPSG", 1024],
     }
 
     TEMPLATE_OCENTRIC_SPHERE = """PROJCRS["$projection_name",

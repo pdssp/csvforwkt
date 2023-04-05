@@ -122,6 +122,7 @@ Contributors
 ------------
 👤 **Trent Hare**
 👤 **Benoit Seignovert**
+👤 **Andrew Annex**
 
 
 🤝 Contributing

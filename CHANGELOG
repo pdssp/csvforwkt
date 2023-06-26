@@ -1,4 +1,44 @@
-### Update Readme (HEAD -> main)
+### Implements https://github.com/opengeospatial/Planetary-DWG/blob/main/draft_crs_definitions/proposal001.adoc from issue https://github.com/opengeospatial/Planetary-DWG/issues/5 (HEAD -> proposal001)
+>Mon, 26 Jun 2023 09:53:07 +0200
+
+>Author: Jean-Christophe Malapert (jean-christophe.malapert@cnes.fr)
+
+>Commiter: Jean-Christophe Malapert (jean-christophe.malapert@cnes.fr)
+
+
+
+
+### Update README.rst (origin/main, origin/HEAD, main)
+>Wed, 5 Apr 2023 23:22:21 +0200
+
+>Author: Jean-Christophe Malapert (jean-christophe.malapert@cnes.fr)
+
+>Commiter: GitHub (noreply@github.com)
+
+Add Andrew Annex as contributor
+
+
+### make consistent with epsg:3857
+>Sun, 5 Mar 2023 16:24:34 -0800
+
+>Author: Andrew Annex (ama6fy@virginia.edu)
+
+>Commiter: Andrew Annex (ama6fy@virginia.edu)
+
+
+
+
+### start of adding web mercator
+>Thu, 2 Mar 2023 14:50:54 -0800
+
+>Author: Andrew Annex (ama6fy@virginia.edu)
+
+>Commiter: Andrew Annex (ama6fy@virginia.edu)
+
+
+
+
+### Update Readme (tag: 0.2)
 >Sat, 24 Dec 2022 14:58:33 +0100
 
 >Author: Jean-Christophe Malapert (jean-chrsitophe.malapert@cnes.fr)

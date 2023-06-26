@@ -174,7 +174,7 @@ class BodyCrs(ICrs):
 \tID["IAU", $number, $version],
 \tREMARK["$remark"]]"""
 
-    TEMPLATE_SPHERE = """GEOGCRS["$name ($version) - Sphere / Ocentric",
+    TEMPLATE_SPHERE = """GEOGCRS["$name ($version) - Sphere ",
     $datum,
 \tCS[ellipsoidal, 2],
 \t    AXIS["geodetic latitude (Lat)", north,
@@ -911,8 +911,8 @@ class ProjectionBody(ICrs):
         ],
         [
             90,
-            "Popular Visualisation Pseudo-Mercator",
-            "Popular Visualisation Pseudo Mercator",
+            "Mercator",
+            "Mercator (Spherical)",
             "Latitude of natural origin",
             0,
             "Longitude of natural origin",
@@ -929,6 +929,7 @@ class ProjectionBody(ICrs):
     ]
 
     METHOD_AND_PARAM_MAPPING: Dict[str, List] = {
+        "Mercator (Spherical)": ["EPSG", 1026],
         "Lambert Azimuthal Equal Area (Spherical)": ["EPSG", 1027],
         "Equidistant Cylindrical": ["EPSG", 1028],
         "Equidistant Cylindrical (Spherical)": ["EPSG", 1029],
@@ -1094,16 +1095,14 @@ class ProjectionBody(ICrs):
                 projection
                 + "- "
                 + self.body_crs.datum.body.shape.value
-                + " / "
-                + self.body_crs.crs_type.value
-                + f"/ {self.projection[1]}"
+                + f" / {self.projection[1]}"
             )
         else:
             reference = (
                 projection
                 + "/ "
                 + self.body_crs.crs_type.value
-                + f"/ {self.projection[1]}"
+                + f" / {self.projection[1]}"
             )
         return reference
 
@@ -1118,12 +1117,7 @@ class ProjectionBody(ICrs):
             self.body_crs.crs_type == CrsType.OCENTRIC
             and self.body_crs.datum.body.shape == ReferenceShape.SPHERE
         ):
-            reference = (
-                "- "
-                + self.body_crs.datum.body.shape.value
-                + " / "
-                + self.body_crs.crs_type.value
-            )
+            reference = "- " + self.body_crs.datum.body.shape.value
         else:
             reference = "/ " + self.body_crs.crs_type.value
         return reference

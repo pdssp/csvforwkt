@@ -106,7 +106,7 @@ def parse_cli() -> argparse.Namespace:
     parser.add_argument(
         "--iau_doi",
         required=True,
-        help="DOI of the IAU report (ex: https://doi.org/10.1007/s10569-017-9805-5)",
+        help="DOI of the IAU report (ex: doi:10.1007/s10569-017-9805-5)",
     )
 
     parser.add_argument(

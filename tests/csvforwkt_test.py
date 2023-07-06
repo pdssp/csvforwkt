@@ -23,7 +23,7 @@ def pytest_namespace():
 def data():
     iau_data = "data/naifcodes_radii_m_wAsteroids_IAU2015.csv"
     iau_version = 2015
-    iau_doi = "https://doi.org/10.1007/s10569-017-9805-5"
+    iau_doi = "doi:10.1007/s10569-017-9805-5"
     csv2wkt = CsvforwktLib(iau_data, iau_version, iau_doi, "/tmp")
     pytest.crs = csv2wkt.process()
 
@@ -131,7 +131,7 @@ def test_iau(data):
     blank_line_regex = r"(?:\r?\n){2,}"
     wkts = re.split(blank_line_regex, content.strip())
     for wkt in wkts:
-        iau_line_regexo = '"IAU",(.*),2015'
+        iau_line_regexo = '"IAU", (.*), 2015'
         m = re.findall(iau_line_regexo, wkt)
         # print(f"{m} -> {wkt}")
         id: int
@@ -155,7 +155,6 @@ def test_iau(data):
         iau_wkt_proj = (
             iau_wkt_proj.replace("\t", "")
             .replace(" ", "")
-            .replace("HunKal:20W.0", "")
             .replace(
                 "Usemeanradiusassphereradiusforinteroperability.",
                 "Usemeanradiusassphereforinteroperability.",
@@ -164,73 +163,20 @@ def test_iau(data):
                 "usassphereforinteroperability.",
                 "usassphereradiusforinteroperability.",
             )
-            .replace("argelobe:0.0", "argelobe:0")
-            .replace("pactsite:0.0", "pactsite:0")
             .replace("UseR_m=(a+b+c)/3asmeanradius.", "")
-            .replace('AXIS["westing(W)', 'AXIS["(W)')
         )
         generated_wkt = (
             generated_wkt.replace("\t", "")
             .replace(" ", "")
-            .replace(',ID["EPSG",9001]', "")
-            .replace(',ID["EPSG",9122]', "")
             .replace(',ID["EPSG",9201]', "")
-            .replace("HunKal:20W", "")
-            .replace("Ariadne:0", "Ariadne:0.0")
-            .replace("Greenwich:0", "Greenwich:0.0")
-            .replace("695700000.0", "695700000")
-            .replace("2440530.0", "2440530")
-            .replace("6051800.0", "6051800")
-            .replace("1737400.0", "1737400")
-            .replace("23348017621", "2334801762")
-            .replace("700617732406", "7006177324")
-            .replace("944472236118", "94447223612")
-            .replace("irection:0", "irection:0.0")
-            .replace("Cilix:182W", "Cilix:182W.0")
-            .replace("2631200.0", "2631200")
-            .replace("Anat:128W", "Anat:128W.0")
-            .replace("2410300.0", "2410300")
-            .replace("Saga:326W", "Saga:326W.0")
-            .replace("4402759810264", "44027598103")
-            .replace(",198200.0,", ",198200,")
-            .replace("mides:162W", "mides:162W.0")
-            .replace("Salih:5W", "Salih:5W.0")
-            .replace("Arete:299W", "Arete:299W.0")
-            .replace("inurus:63W", "inurus:63W.0")
-            .replace("Tore:340W", "Tore:340W.0")
-            .replace("meric:276W", "meric:276W.0")
-            .replace("345238095238", "34523809524")
-            .replace("285714285714,", "2857142857,")
-            .replace("3735224586285,", "37352245863,")
-            .replace("meridian:0", "meridian:0.0")
-            .replace("edCheops:0", "edCheops:0.0")
-            .replace("8000,2.0", "8000,2")
-            .replace("Kait:0", "Kait:0.0")
-            .replace("9031476997579,", "90314769976,")
-            .replace("laudia:146", "laudia:146.0")
-            .replace("ormation:0", "ormation:0.0")
-            .replace("rrected):0", "rrected):0.0")
-            .replace("333.333333333336,", "333.333333,")
-            .replace("edcrater:0", "edcrater:0.0")
-            .replace("2608695652173,", "26086956522,")
-            .replace("277.83UT:0", "277.83UT:0.0")
-            .replace("Topaz:0", "Topaz:0.0")
-            .replace("1331.6666666666667,", "1331.666667,")
-            .replace("withW0=0:0", "withW0=0:0.0")
-            .replace("Afon:0", "Afon:0.0")
-            .replace("Charax:0", "Charax:0.0")
-            .replace('AXIS["Easting(E)"', 'AXIS["(E)"')
-            .replace('AXIS["Northing(N)"', 'AXIS["(N)"')
-            .replace('AXIS["Westing(W)', 'AXIS["(W)')
-            .replace('AXIS["westing(W)', 'AXIS["(W)')
             .replace(
-                "https://doi.org/10.1007/s10569-017-9805-5",
-                "doi://10.1007/s10569-017-9805-5",
+                'SCALEUNIT["unity",1]', 'SCALEUNIT["unity",1,ID["EPSG",9201]]'
             )
-            # .replace("Easting", "")
-            # .replace("Northing", "")
         )
-        # print(generated_wkt)
-        # print(iau_wkt_proj)
-        # print(f"IAU code: {key}")
+        print(generated_wkt)
+        print("-------")
+        print(iau_wkt_proj)
+        print(f"IAU code: {key}")
+        print("=============")
+        print("=============")
         assert iau_wkt_proj == generated_wkt, f"IAU code: {key}"

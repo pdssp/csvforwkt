@@ -179,7 +179,32 @@ class CsvforwktLib:
         Returns:
             bool: True when the IAU2015_Semimajor >=  IAU2015_Semiminor
         """
-        return row["IAU2015_Semimajor"] >= row["IAU2015_Semiminor"]
+
+        if row["IAU2015_Semimajor"] <= 0 and row["IAU2015_Semiminor"] > 0:
+            logger.warning(
+                f"Not valid flattening  ID:{row['Naif_id']} - Body:{row['Body']} - Semi-major:{row['IAU2015_Semimajor']}"
+            )
+            is_valid = False
+        elif row["IAU2015_Semimajor"] > 0 and row["IAU2015_Semiminor"] <= 0:
+            logger.warning(
+                f"Not valid flattening : {row['Naif_id']} - {row['Body']} - Semi-minor:{row['IAU2015_Semiminor']}"
+            )
+            is_valid = False
+        else:
+            is_valid = row["IAU2015_Semimajor"] >= row["IAU2015_Semiminor"]
+
+        return is_valid
+
+    def has_direction(self, row: pd.Series) -> bool:
+        """Check if the body has a known ortation sens
+
+        Args:
+            row (pd.Series): current body description
+
+        Returns:
+            bool: True when the rotation of the body has a direction otherwise False
+        """
+        return row["rotation"] in ["Retrograde", "Direct"]
 
     def _is_retrograde(  # pylint: disable=no-self-use
         self, row: pd.Series
@@ -231,17 +256,28 @@ class CsvforwktLib:
         """
         crs: Dict[int, ICrs] = dict()
         for _, row in body.iterrows():
+            # Create a spherical planetocentric CRS
             sphere_crs = Planetocentric(row, ReferenceShape.SPHERE)
             crs[sphere_crs.crs.iau_code] = sphere_crs.crs
+
+            # Check the body is not a spherical datum and have a valid flattening to create planetocentric CRS
             if not self._is_sphere(row) and self._is_valid_flatenning(row):
                 ocentric_crs = Planetocentric(row, ReferenceShape.ELLIPSE)
                 crs[ocentric_crs.crs.iau_code] = ocentric_crs.crs
+
+            # Check the body is not a spherical datum and other conditions to create planetograhic CRS
             if not (
                 self._is_sphere(row)
                 and (self._is_retrograde(row) or self._is_historic(row))
             ) and self._is_valid_flatenning(row):
                 ographic = Planetographic(row, ReferenceShape.ELLIPSE)
+                if not self.has_direction(row):
+                    logger.warning(
+                        f"No direction known for {row[1]}- skip planetographic CRS"
+                    )
+                    continue
                 crs[ographic.crs.iau_code] = ographic.crs
+
         logger.info(f"\t\tNumber of processed bodies: {len(crs.keys())}")
         return crs
 
@@ -264,6 +300,11 @@ class CsvforwktLib:
             ocentric_crs = Planetocentric(row, ReferenceShape.TRIAXIAL)
             crs[ocentric_crs.crs.iau_code] = ocentric_crs.crs
             ographic = Planetographic(row, ReferenceShape.TRIAXIAL)
+            if not self.has_direction(row):
+                logger.warning(
+                    f"No direction known for {row[1]}- skip planetographic CRS"
+                )
+                continue
             crs[ographic.crs.iau_code] = ographic.crs
         logger.info(f"\t\tNumber of processed bodies: {len(crs.keys())}")
         return crs
@@ -283,6 +324,13 @@ class CsvforwktLib:
         for _, value in crs.items():
             body_crs: BodyCrs = cast(BodyCrs, value)
             for projection in ProjectionBody.iter_projection(body_crs):
+                if (
+                    body_crs.datum.body.shape != ReferenceShape.SPHERE
+                    and projection.projection[0] == 90
+                ):
+                    # see https://github.com/pdssp/planet_crs_registry/issues/6
+                    continue
+
                 crs_projection[projection.iau_code] = projection
         return crs_projection
 

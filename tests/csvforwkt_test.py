@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
+import re
+import subprocess
 from typing import Dict
 
 import pytest
@@ -11,7 +13,7 @@ from csvforwkt.csvforwkt import CsvforwktLib
 # import numpy as np
 
 # from PIL import Image
-
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -121,8 +123,6 @@ def test_iau(data):
       - the DOI URL by waiting we regenerate the DOI URL with GDAL
 
     """
-    import re
-
     iau_prj = {}
     content = ""
     with open("tests/iau.wkt", "r") as file:
@@ -180,3 +180,40 @@ def test_iau(data):
         print("=============")
         print("=============")
         assert iau_wkt_proj == generated_wkt, f"IAU code: {key}"
+
+
+def test_gdal(data):
+    """Test if the projections are in GDAL"""
+    ids_wkt = []
+    content = ""
+    with open("tests/iau.wkt", "r") as file:
+        content = file.read()
+
+    blank_line_regex = r"(?:\r?\n){2,}"
+    wkts = re.split(blank_line_regex, content.strip())
+    for wkt in wkts:
+        if "TRIAXIAL" in wkt:
+            # Skip triaxial : not supported in GDAL
+            continue
+        iau_line_regexo = '"IAU", (.*), 2015'
+        m = re.findall(iau_line_regexo, wkt)
+        id: int
+        if len(m) > 1:
+            id = int(m[1])
+        else:
+            id = int(m[0])
+        ids_wkt.append(id)
+
+    errors = []
+    for id in ids_wkt:
+        output = subprocess.run(
+            ["/usr/bin/gdalsrsinfo", f"IAU_2015:{id}"], stderr=subprocess.PIPE
+        )
+        result = output.stderr.decode("UTF-8")
+        if "failed to load SRS" in result:
+            logger.error(f"Not found in GDAL for projection {id}")
+            errors.append(result)
+        else:
+            logger.info(f"No problem for projection {id}")
+
+    assert len(errors) == 0

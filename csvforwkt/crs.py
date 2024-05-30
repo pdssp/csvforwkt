@@ -33,8 +33,11 @@ Positive logitudes in one direction are defined with the following rule
         if (rotation == "Direct" ?) then (yes)
             :West;
             stop
-        else (no)
+        elif (rotation == "Retrograde" ?) then (yes)
             :East;
+            stop
+        else (no)
+            :None;
             stop
         endif
     endif
@@ -51,6 +54,7 @@ from typing import cast
 from typing import Dict
 from typing import Generator
 from typing import List
+from typing import Optional
 from typing import Tuple
 
 import numpy as np  # pylint: disable=import-error
@@ -287,9 +291,12 @@ class BodyCrs(ICrs):
         elif rotation == "Direct":
             direction = "west"
 
-        # last case : east
-        else:
+        elif rotation == "Retrograde":
             direction = "east"
+
+        # last case : we do not know
+        else:
+            direction = None
         return direction
 
     def _create_remark(self) -> str:
@@ -333,11 +340,11 @@ class BodyCrs(ICrs):
         return self.__datum
 
     @property
-    def direction(self) -> str:
+    def direction(self) -> Optional[str]:
         """Returns the direction where the longitude is counted positively.
 
         Returns:
-            str: the direction
+            Optional[str]: the direction
         """
         return self.__direction
 
@@ -356,6 +363,9 @@ class BodyCrs(ICrs):
         Returns:
             str: the WKT of the celestial body
         """
+        assert (
+            self.direction is not None
+        ), f"Not possible to create the {self.crs_type} : there is not axis direction for {self.datum.name}"
         biaxialbody_template = Template(self.__template)
         datum = biaxialbody_template.substitute(
             name=self.name,

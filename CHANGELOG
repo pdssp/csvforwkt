@@ -1,4 +1,14 @@
-### Fixes #8 Implements https://github.com/pdssp/planet_crs_registry/issues/6 (HEAD -> proposal001)
+### Updates tests (HEAD -> proposal001)
+>Thu, 30 May 2024 09:27:13 +0200
+
+>Author: Jean-Christophe Malapert (jean-christophe.malapert@cnes.fr)
+
+>Commiter: Jean-Christophe Malapert (jean-christophe.malapert@cnes.fr)
+
+
+
+
+### Fixes #8 Implements https://github.com/pdssp/planet_crs_registry/issues/6 (origin/proposal001)
 >Thu, 30 May 2024 09:18:04 +0200
 
 >Author: Jean-Christophe Malapert (jean-christophe.malapert@cnes.fr)
@@ -8,7 +18,7 @@
 
 
 
-### Update tests Update http://doi.org/<doi> to doi:<doi> (origin/proposal001)
+### Update tests Update http://doi.org/<doi> to doi:<doi>
 >Mon, 26 Jun 2023 14:24:44 +0200
 
 >Author: Jean-Christophe Malapert (jean-christophe.malapert@cnes.fr)

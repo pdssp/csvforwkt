@@ -14,6 +14,7 @@ from ._version import __name_soft__
 from .body import IAU_REPORT
 from .body import ReferenceShape
 from .crs import BodyCrs
+from .crs import CrsType
 from .crs import ICrs
 from .crs import Planetocentric
 from .crs import Planetographic
@@ -232,7 +233,9 @@ class CsvforwktLib:
         """
         return row["Body"] in ["Sun", "Earth", "Moon"]
 
-    def _process_body_crs_biaxial(self, body: pd.DataFrame) -> Dict[int, ICrs]:
+    def _process_body_crs_biaxial(
+        self, body: pd.DataFrame
+    ) -> Dict[int, Dict[int, ICrs]]:
         """Process biaxial bodies and avoid duplicate desriptions.
 
         The Rules are the following to avoid duplication:
@@ -252,18 +255,20 @@ class CsvforwktLib:
             ref_shape (ReferenceShape): Type of the shape
 
         Returns:
-            Dict[int, ICrs]: IAU code and CRS description
+            Dict[int,Dict[int, ICrs]]: IAU code and CRS description group by body number
         """
-        crs: Dict[int, ICrs] = dict()
+        crs: Dict[int, Dict[int, ICrs]] = dict()
         for _, row in body.iterrows():
+            crs[row[0]] = dict()
+
             # Create a spherical planetocentric CRS
             sphere_crs = Planetocentric(row, ReferenceShape.SPHERE)
-            crs[sphere_crs.crs.iau_code] = sphere_crs.crs
+            crs[row[0]][sphere_crs.crs.iau_code] = sphere_crs.crs
 
             # Check the body is not a spherical datum and have a valid flattening to create planetocentric CRS
             if not self._is_sphere(row) and self._is_valid_flatenning(row):
                 ocentric_crs = Planetocentric(row, ReferenceShape.ELLIPSE)
-                crs[ocentric_crs.crs.iau_code] = ocentric_crs.crs
+                crs[row[0]][ocentric_crs.crs.iau_code] = ocentric_crs.crs
 
             # Check the body is not a spherical datum and other conditions to create planetograhic CRS
             if not (
@@ -276,14 +281,14 @@ class CsvforwktLib:
                         f"No direction known for {row[1]}- skip planetographic CRS"
                     )
                     continue
-                crs[ographic.crs.iau_code] = ographic.crs
+                crs[row[0]][ographic.crs.iau_code] = ographic.crs
 
         logger.info(f"\t\tNumber of processed bodies: {len(crs.keys())}")
         return crs
 
     def _process_body_crs_triaxial(  # pylint: disable=no-self-use
         self, body: pd.DataFrame
-    ) -> Dict[int, ICrs]:
+    ) -> Dict[int, Dict[int, ICrs]]:
         """Process triaxial bodies.
 
         Args:
@@ -291,56 +296,84 @@ class CsvforwktLib:
             ref_shape (ReferenceShape): Type of the shape
 
         Returns:
-            Dict[int, ICrs]: IAU code and CRS description
+            Dict[int,Dict[int, ICrs]]: IAU code and CRS description group by body number
         """
-        crs: Dict[int, ICrs] = dict()
+        crs: Dict[int, Dict[int, ICrs]] = dict()
         for _, row in body.iterrows():
+            crs[row[0]] = dict()
             sphere_crs = Planetocentric(row, ReferenceShape.SPHERE)
-            crs[sphere_crs.crs.iau_code] = sphere_crs.crs
+            crs[row[0]][sphere_crs.crs.iau_code] = sphere_crs.crs
             ocentric_crs = Planetocentric(row, ReferenceShape.TRIAXIAL)
-            crs[ocentric_crs.crs.iau_code] = ocentric_crs.crs
+            crs[row[0]][ocentric_crs.crs.iau_code] = ocentric_crs.crs
             ographic = Planetographic(row, ReferenceShape.TRIAXIAL)
             if not self.has_direction(row):
                 logger.warning(
                     f"No direction known for {row[1]}- skip planetographic CRS"
                 )
                 continue
-            crs[ographic.crs.iau_code] = ographic.crs
+            crs[row[0]][ographic.crs.iau_code] = ographic.crs
         logger.info(f"\t\tNumber of processed bodies: {len(crs.keys())}")
         return crs
 
+    def _has_ographic_east(self, crs: Dict[int, ICrs], datum: ReferenceShape):
+        return any(
+            isinstance(body_crs, BodyCrs)
+            and body_crs.crs_type.name == CrsType.OGRAPHIC.name
+            and body_crs.direction == "east"
+            and body_crs.datum.body.shape.name == datum.name
+            for body_crs in crs.values()
+        )
+
     def _process_body_projection_crs(  # pylint: disable=no-self-use
         self, crs: Dict[int, ICrs]
-    ) -> Dict[int, ICrs]:
+    ) -> Dict[int, Dict[int, ICrs]]:
         """Process the projection description based on a body CRS.
 
         Args:
-            crs (Dict[int, ICrs]): bodies CRS
+            crs (Dict[Dict[int, ICrs]]): bodies CRS group by body ID
 
         Returns:
-            Dict[int, ICrs]: projections CRS
+            Dict[int, Dict[int, ICrs]]: projections CRS
         """
-        crs_projection: Dict[int, ICrs] = dict()
-        for _, value in crs.items():
-            body_crs: BodyCrs = cast(BodyCrs, value)
-            for projection in ProjectionBody.iter_projection(body_crs):
+        crs_projection: Dict[int, Dict[int, ICrs]] = dict()
+        for body_id, body_crs in crs.items():
+            crs_projection[body_id] = dict()
+            for _, value in crs[body_id].items():
+                body_crs: BodyCrs = cast(BodyCrs, value)
+
                 if (
-                    body_crs.datum.body.shape != ReferenceShape.SPHERE
-                    and projection.projection[0] == 90
+                    body_crs.crs_type.name == CrsType.OCENTRIC.name
+                    and self._has_ographic_east(
+                        crs[body_id], body_crs.datum.body.shape
+                    )
                 ):
-                    # see https://github.com/pdssp/planet_crs_registry/issues/6
+                    # if the CRS is ocentric for a given body and it exists a, ographic one to east,We don't need to generate
+                    # projection for ocentric because it will be generated for ographic and both are equivalent
+                    logger.warning(
+                        f"Skip projection for {body_id} ocentric since it will be generated for ographic with direction east"
+                    )
                     continue
 
-                crs_projection[projection.iau_code] = projection
+                for projection in ProjectionBody.iter_projection(body_crs):
+                    print(projection.projection[0])
+                    if (
+                        body_crs.datum.body.shape != ReferenceShape.SPHERE
+                        and projection.projection[0] == 90
+                    ):
+                        # see https://github.com/pdssp/planet_crs_registry/issues/6
+                        continue
+
+                    crs_projection[body_id][projection.iau_code] = projection
+
         return crs_projection
 
-    def process(self) -> Dict[int, ICrs]:
+    def process(self) -> Dict[int, Dict[int, ICrs]]:
         """Process the bodies.
 
         Returns:
-            Dict[int, ICrs]: CRS
+            Dict[int, Dict[int, ICrs]]: CRS group by body
         """
-        crs: Dict[int, ICrs] = {}
+        crs: Dict[int, Dict[int, ICrs]] = {}
         nb_records: int = self.__df_bodies.shape[0]
         logger.info(f"\tNumber of bodies in IAU report {nb_records}")
         self._skip_records()
@@ -352,14 +385,16 @@ class CsvforwktLib:
         biaxial, triaxial = self._split_body()
 
         logger.info("\n\tProcessing of biaxial body")
-        biaxial_crs: Dict[int, ICrs] = self._process_body_crs_biaxial(biaxial)
+        biaxial_crs: Dict[
+            int, Dict[int, ICrs]
+        ] = self._process_body_crs_biaxial(biaxial)
         crs.update(biaxial_crs)
         logger.info("\t\tprocess WKT for biaxial bodies ... OK")
 
         logger.info("\n\tProcessing of triaxial body")
-        triaxial_crs: Dict[int, ICrs] = self._process_body_crs_triaxial(
-            triaxial
-        )
+        triaxial_crs: Dict[
+            int, Dict[int, ICrs]
+        ] = self._process_body_crs_triaxial(triaxial)
         crs.update(triaxial_crs)
         logger.info("\t\tprocess WKT for triaxial bodies ... OK")
 
@@ -371,18 +406,19 @@ class CsvforwktLib:
 
         return collections.OrderedDict(sorted(crs.items()))
 
-    def save(self, crs: Dict[int, ICrs]):
+    def save(self, crs: Dict[int, Dict[int, ICrs]]):
         """Save the result as file
 
         Args:
-            crs (Dict[int, ICrs]): CRS
+            crs (Dict[int, Dict[int, ICrs]]): CRS
         """
         with open(
             os.path.join(self.directory, "iau.wkt"), "w", encoding="utf-8"
         ) as file:
-            for _, wkt in crs.items():
-                file.write(wkt.wkt())
-                file.write("\n\n")
+            for a, body_crs in crs.items():
+                for id, wkt in body_crs.items():
+                    file.write(wkt.wkt())
+                    file.write("\n\n")
         logger.info(
             f"\n\tSave the WKTs in {os.path.join(self.directory, 'iau.wkt')} ... OK"
         )

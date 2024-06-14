@@ -22,12 +22,14 @@ import logging
 import os
 import signal
 import sys
+from typing import Dict
 
 from .csvforwkt import CsvforwktLib
 from csvforwkt import __author__
 from csvforwkt import __copyright__
 from csvforwkt import __description__
 from csvforwkt import __version__
+from csvforwkt.crs import ICrs
 
 
 class SmartFormatter(argparse.HelpFormatter):
@@ -146,7 +148,7 @@ def run():
             options_cli.output_directory,
             level=options_cli.level,
         )
-        crs = csvforwkt.process()
+        crs: Dict[int, Dict[int, ICrs]] = csvforwkt.process()
         csvforwkt.save(crs)
         sys.exit(0)
     except Exception as error:  # pylint: disable=broad-except

@@ -1,4 +1,14 @@
-### Fixes #10 (HEAD -> proposal001)
+### Fix bug when projections are updated (HEAD -> main)
+>Mon, 17 Jun 2024 12:08:46 +0200
+
+>Author: Jean-Christophe Malapert (jean-christophe.malapert@cnes.fr)
+
+>Commiter: Jean-Christophe Malapert (jean-christophe.malapert@cnes.fr)
+
+
+
+
+### Fixes #10 (origin/proposal001)
 >Fri, 14 Jun 2024 19:46:37 +0200
 
 >Author: Jean-Christophe Malapert (jean-christophe.malapert@cnes.fr)
@@ -8,7 +18,7 @@
 
 
 
-### Updates tests (origin/proposal001)
+### Updates tests
 >Thu, 30 May 2024 09:27:13 +0200
 
 >Author: Jean-Christophe Malapert (jean-christophe.malapert@cnes.fr)
@@ -48,7 +58,7 @@
 
 
 
-### Update README.rst (main)
+### Update README.rst
 >Wed, 5 Apr 2023 23:22:21 +0200
 
 >Author: Jean-Christophe Malapert (jean-christophe.malapert@cnes.fr)

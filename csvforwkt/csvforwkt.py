@@ -355,7 +355,6 @@ class CsvforwktLib:
                     continue
 
                 for projection in ProjectionBody.iter_projection(body_crs):
-                    print(projection.projection[0])
                     if (
                         body_crs.datum.body.shape != ReferenceShape.SPHERE
                         and projection.projection[0] == 90
@@ -366,6 +365,21 @@ class CsvforwktLib:
                     crs_projection[body_id][projection.iau_code] = projection
 
         return crs_projection
+
+    def _merge_dicts(
+        self,
+        dict1: Dict[int, Dict[int, ICrs]],
+        dict2: Dict[int, Dict[int, ICrs]],
+    ) -> Dict[int, Dict[int, ICrs]]:
+        merged_dict = dict1.copy()
+
+        for key2, subdict2 in dict2.items():
+            if key2 in merged_dict:
+                merged_dict[key2].update(subdict2)
+            else:
+                merged_dict[key2] = subdict2
+
+        return merged_dict
 
     def process(self) -> Dict[int, Dict[int, ICrs]]:
         """Process the bodies.
@@ -401,7 +415,7 @@ class CsvforwktLib:
         logger.info(
             "\n\tProcessing of projected CRS for both baxial and triaxial"
         )
-        crs.update(self._process_body_projection_crs(crs))
+        crs = self._merge_dicts(crs, self._process_body_projection_crs(crs))
         logger.info("\t\tprocess WKT for projected CRS ... OK")
 
         return collections.OrderedDict(sorted(crs.items()))
